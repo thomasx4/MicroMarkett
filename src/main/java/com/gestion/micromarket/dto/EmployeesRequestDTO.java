@@ -31,5 +31,6 @@ public class EmployeesRequestDTO {
     @DecimalMin(value = "0.0", inclusive = true, message = "El salario no puede ser menor a 0.0")
     @Positive(message = "El salario debe de ser mayor a 0")
     private BigDecimal salary;
+    private Boolean active; 
 
 }
