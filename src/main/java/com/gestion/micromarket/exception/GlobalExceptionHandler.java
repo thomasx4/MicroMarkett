@@ -33,8 +33,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<MessageResponseDTO> handleRuntimeException(RuntimeException ex) {
-        MessageResponseDTO response = new MessageResponseDTO();
-        response.setMessage(ex.getMessage());
+        MessageResponseDTO response = new MessageResponseDTO(ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }
