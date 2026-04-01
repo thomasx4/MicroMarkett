@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: micromarket
+  datasource:
+    url: jdbc:mysql://hopper.proxy.rlwy.net:54635/railway
+    username: root
+    password: kFGarzQcekExuoLiwYqpQKrJMjtfLrwg
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties: 
+      hibernate: 
+        '[format_sql]': true
+        dialect: org.hibernate.dialect.MySQLDialect
+      database-platform: org.hibernate.dialect.MySQLDialect
+
+jackson:
+  serialization:
+    indent-output: true
+
+logging:
+  level:
+    '[org.springframework]': INFO
+    '[org.hibernate.sql]': DEBUG
+    '[org.hibernate.type.descriptor.sql]': TRACE
+
+server:
+  port: 9090
+  servlet: 
+    context-path: /micromarket
+
