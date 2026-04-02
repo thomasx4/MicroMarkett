@@ -1,6 +1,9 @@
 package com.gestion.micromarket.service;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -39,4 +42,10 @@ public class ProductsService {
         return new MessageResponseDTO("Producto creado correctamente");
     }
 
+    public List<ProductsResponseDTO> findAll() {
+        return repository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
 }
