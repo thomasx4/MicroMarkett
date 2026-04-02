@@ -94,4 +94,29 @@ public class ProductsService {
 
         return new MessageResponseDTO("Producto eliminado correctamente");
     }
+
+    public MessageResponseDTO update(Long id, ProductsRequestDTO dto) {
+
+        Products product = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        if (!product.getBarcode().equals(dto.getBarcode()) &&
+                repository.existsByBarcode(dto.getBarcode())) {
+            throw new RuntimeException("El código de barras ya está en uso");
+        }
+
+        Categories category = categoryRepository.findById(dto.getCategoryId())
+                .orElseThrow(() -> new RuntimeException("Categoría no encontrada"));
+
+        product.setName(dto.getName());
+        product.setBarcode(dto.getBarcode());
+        product.setPrice(dto.getPrice());
+        product.setStock(dto.getStock());
+        product.setActive(dto.getActive());
+        product.setCategory(category);
+
+        repository.save(product);
+
+        return new MessageResponseDTO("Producto actualizado correctamente");
+    }
 }
