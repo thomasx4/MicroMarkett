@@ -86,4 +86,12 @@ public class ProductsService {
         return products.stream().map(this::toDTO).toList();
     }
 
+    public MessageResponseDTO delete(Long id) {
+        Products product = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        repository.delete(product);
+
+        return new MessageResponseDTO("Producto eliminado correctamente");
+    }
 }
