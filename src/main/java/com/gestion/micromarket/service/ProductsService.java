@@ -3,7 +3,6 @@ package com.gestion.micromarket.service;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
