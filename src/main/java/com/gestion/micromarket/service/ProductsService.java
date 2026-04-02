@@ -119,4 +119,18 @@ public class ProductsService {
 
         return new MessageResponseDTO("Producto actualizado correctamente");
     }
+
+    private ProductsResponseDTO toDTO(Products product) {
+        return ProductsResponseDTO.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .barcode(product.getBarcode())
+                .price(product.getPrice())
+                .stock(product.getStock())
+                .active(product.getActive())
+                .createdAt(product.getCreatedAt())
+                .categoryName(product.getCategory().getName())
+                .build();
+    }
+
 }
