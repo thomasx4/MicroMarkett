@@ -1,6 +1,9 @@
 package com.gestion.micromarket.service;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +40,50 @@ public class ProductsService {
         repository.save(product);
 
         return new MessageResponseDTO("Producto creado correctamente");
+    }
+
+    public List<ProductsResponseDTO> findAll() {
+        return repository.findAll()
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    public ProductsResponseDTO findById(Long id) {
+        Products product = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        return toDTO(product);
+    }
+
+    public List<ProductsResponseDTO> findByName(String name) {
+
+        List<Products> products = repository.findByNameContainingIgnoreCase(name);
+
+        if (products.isEmpty()) {
+            throw new RuntimeException("No se encontraron productos con ese nombre");
+        }
+
+        return products.stream().map(this::toDTO).toList();
+    }
+
+    public ProductsResponseDTO findByBarcode(String barcode) {
+
+        Products product = repository.findByBarcode(barcode)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ese código de barras"));
+
+        return toDTO(product);
+    }
+
+    public List<ProductsResponseDTO> findByCategory(Long categoryId) {
+
+        List<Products> products = repository.findByCategoryId(categoryId);
+
+        if (products.isEmpty()) {
+            throw new RuntimeException("No hay productos en esa categoría");
+        }
+
+        return products.stream().map(this::toDTO).toList();
     }
 
 }
