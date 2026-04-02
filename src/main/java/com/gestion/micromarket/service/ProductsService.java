@@ -48,4 +48,42 @@ public class ProductsService {
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
+
+    public ProductsResponseDTO findById(Long id) {
+        Products product = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        return toDTO(product);
+    }
+
+    public List<ProductsResponseDTO> findByName(String name) {
+
+        List<Products> products = repository.findByNameContainingIgnoreCase(name);
+
+        if (products.isEmpty()) {
+            throw new RuntimeException("No se encontraron productos con ese nombre");
+        }
+
+        return products.stream().map(this::toDTO).toList();
+    }
+
+    public ProductsResponseDTO findByBarcode(String barcode) {
+
+        Products product = repository.findByBarcode(barcode)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ese código de barras"));
+
+        return toDTO(product);
+    }
+
+    public List<ProductsResponseDTO> findByCategory(Long categoryId) {
+
+        List<Products> products = repository.findByCategoryId(categoryId);
+
+        if (products.isEmpty()) {
+            throw new RuntimeException("No hay productos en esa categoría");
+        }
+
+        return products.stream().map(this::toDTO).toList();
+    }
+
 }
