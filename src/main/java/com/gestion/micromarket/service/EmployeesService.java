@@ -141,7 +141,7 @@ public class EmployeesService {
         List<Employees> employees = employeesRepository.findByActive(active);
 
         if (employees.isEmpty()) {
-            throw new RuntimeException("No existe el temrino: " + active);
+            throw new RuntimeException("No se encontraron empleados con estado activo: " + active);
         }
 
         return employees.stream().map(this::mapToResponseactiveDTO).collect(Collectors.toList());
@@ -231,7 +231,7 @@ public class EmployeesService {
         return mapToResponseDTO(employee);
     }
 
-    // ------------------------------ UPDATE
+    // ------------------------------ UPDATE ONLY ONE O MORE
     // -----------------------------------------------
 
     public EmployeesResponseDTO updateEmployee(Long id, EmployeesRequestDTO employeesRequestDTO) {
@@ -270,6 +270,30 @@ public class EmployeesService {
 
         employeesRepository.save(employee);
         return mapToResponseDTO(employee);
+    }
+
+    // ------------------------------ DELETE BY ID
+    // -----------------------------------------------
+
+    public MessageResponseDTO deleteEmployeeByid(Long id) {
+        Employees employee = employeesRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Empleado no encontrado con el id: " + id));
+
+        employeesRepository.delete(employee);
+
+        return new MessageResponseDTO("Empleado Eliminado Correctamente 😀");
+    }
+
+    // ------------------------------ DELETE BY DOCUMENT NUMBER
+    // -----------------------------------------------
+
+    public MessageResponseDTO deleteEmployeeByNumberDocument(String documentNumber) {
+        Employees employee = employeesRepository.findByDocumentNumber(documentNumber).orElseThrow(
+                () -> new RuntimeException("Empleado no econtrado con el numero de documento: " + documentNumber));
+
+        employeesRepository.delete(employee);
+
+        return new MessageResponseDTO("Empleado Eliminado Correctamente 😀");
     }
 
 }
