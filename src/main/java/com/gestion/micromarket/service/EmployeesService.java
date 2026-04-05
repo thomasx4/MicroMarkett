@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 
 import com.gestion.micromarket.dto.EmployeesRequestDTO;
@@ -42,10 +41,7 @@ public class EmployeesService {
 
         employeesRepository.save(employees);
 
-        MessageResponseDTO messageResponseDTO = new MessageResponseDTO();
-        messageResponseDTO.setMessage("Empleado creado ¡Correctamente 😊!");
-
-        return messageResponseDTO;
+        return new MessageResponseDTO("Empleado creado ¡Correctamente 😊!");
 
     }
 
@@ -138,6 +134,58 @@ public class EmployeesService {
         return employeesResponseDTO;
     }
 
+    // ------------------------------ GET BY ACTIVE
+    // ------------------------------------------------
+
+    public List<EmployeesResponseDTO> getEmployyesByActive(Boolean active) {
+        List<Employees> employees = employeesRepository.findByActive(active);
+
+        if (employees.isEmpty()) {
+            throw new RuntimeException("No existe el temrino: " + active);
+        }
+
+        return employees.stream().map(this::mapToResponseactiveDTO).collect(Collectors.toList());
+
+    }
+
+    private EmployeesResponseDTO mapToResponseactiveDTO(Employees employee) {
+        EmployeesResponseDTO employeesResponseDTO = new EmployeesResponseDTO();
+        employeesResponseDTO.setId(employee.getId());
+        employeesResponseDTO.setName(employee.getName());
+        employeesResponseDTO.setDocumentNumber(employee.getDocumentNumber());
+        employeesResponseDTO.setRole(employee.getRole().name());
+        employeesResponseDTO.setHireDate(employee.getHireDate());
+        employeesResponseDTO.setSalary(employee.getSalary());
+        employeesResponseDTO.setActive(employee.getActive());
+        employeesResponseDTO.setCreatedAt(employee.getCreatedAt());
+
+        return employeesResponseDTO;
+    }
+
+    // ------------------------------ GET BY HIRE DATE RANGE
+    // -----------------------------------------------
+
+    public List<EmployeesResponseDTO> getEmployeesByHireDateRange(LocalDate startDate, LocalDate endDate) {
+
+        if (startDate == null || endDate == null) {
+            throw new RuntimeException("Las fechas de inicio y fin son obligatorias");
+        }
+
+        if (startDate.isAfter(endDate)) {
+            throw new RuntimeException("La fecha de inicio no puede ser mayor que la fecha de fin");
+        }
+
+        List<Employees> employees = employeesRepository.findByHireDateBetween(startDate, endDate);
+
+        if (employees.isEmpty()) {
+            throw new RuntimeException("No se encontraron empleados contratados entre " + startDate + " y " + endDate);
+        }
+
+        return employees.stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+
+    }
     // ------------------------------ UPDATE COMPLETE
     // -----------------------------------------------
 
@@ -222,31 +270,6 @@ public class EmployeesService {
 
         employeesRepository.save(employee);
         return mapToResponseDTO(employee);
-    }
-
-    // ------------------------------ GET BY HIRE DATE RANGE
-    // -----------------------------------------------
-
-    public List<EmployeesResponseDTO> getEmployeesByHireDateRange(LocalDate startDate, LocalDate endDate) {
-
-        if (startDate == null || endDate == null) {
-            throw new RuntimeException("Las fechas de inicio y fin son obligatorias");
-        }
-
-        if (startDate.isAfter(endDate)) {
-            throw new RuntimeException("La fecha de inicio no puede ser mayor que la fecha de fin");
-        }
-
-        List<Employees> employees = employeesRepository.findByHireDateBetween(startDate, endDate);
-
-        if (employees.isEmpty()) {
-            throw new RuntimeException("No se encontraron empleados contratados entre " + startDate + " y " + endDate);
-        }
-
-        return employees.stream()
-                .map(this::mapToResponseDTO)
-                .collect(Collectors.toList());
-
     }
 
 }
