@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class EmployeesController {
     private final EmployeesService employeesService;
 
+    // ------------------------------- CREATE -------------------------------
+
     @PostMapping()
     public ResponseEntity<MessageResponseDTO> createEmplyees(
             @Valid @RequestBody EmployeesRequestDTO employeesRequestDTO) {
@@ -38,6 +41,7 @@ public class EmployeesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(messageResponseDTO);
     }
 
+    // ------------------------------- GET ALL ----------------------------------
     @GetMapping()
     public ResponseEntity<List<EmployeesResponseDTO>> getAllEmployees() {
         try {
@@ -48,11 +52,17 @@ public class EmployeesController {
         }
     }
 
+    // ------------------------------- GET BY ID
+    // -------------------------------------
+
     @GetMapping("/{id}")
     public ResponseEntity<Optional<EmployeesResponseDTO>> getEmployeeById(@PathVariable Long id) {
         Optional<EmployeesResponseDTO> response = employeesService.getEmployeeById(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    // ------------------------- GET BY DOCUMENT NUMBER
+    // ---------------------------------------
 
     @GetMapping("/documentNumber/{documentNumber}")
     public ResponseEntity<EmployeesResponseDTO> getEmployeeByDocumentNumber(@PathVariable String documentNumber) {
@@ -60,17 +70,40 @@ public class EmployeesController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // ------------------------------ GET BY ROLE
+    // ------------------------------------------------
+
     @GetMapping("/role/{role}")
-    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByRole(@PathVariable Role role) {
-        List<EmployeesResponseDTO> response = employeesService.getEmployeesByRole(role);
+    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByRole(@PathVariable String role) {
+
+        if (!role.equalsIgnoreCase("administrator") && !role.equalsIgnoreCase("cashier")
+                && !role.equalsIgnoreCase("assistant")) {
+            throw new RuntimeException("El rol debe de ser 'administrator', 'cashier', o 'assistant' no: " + role);
+        }
+
+        Role rolEnum = Role.valueOf(role);
+
+        List<EmployeesResponseDTO> response = employeesService.getEmployeesByRole(rolEnum);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // ------------------------------ GET BY ACTIVE
+    // ------------------------------------------------
+
     @GetMapping("active/{active}")
-    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByActive(@PathVariable Boolean active){
-        List<EmployeesResponseDTO> response = employeesService.getEmployyesByActive(active);
+    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByActive(@PathVariable String active) {
+
+        if (!active.equalsIgnoreCase("true") && !active.equalsIgnoreCase("false")) {
+            throw new RuntimeException("El valor debe ser 'true' o 'false', no: " + active);
+        }
+
+        Boolean activeBool = Boolean.valueOf(active);
+        List<EmployeesResponseDTO> response = employeesService.getEmployyesByActive(activeBool);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    // ------------------------------ GET BY HIRE DATE RANGE
+    // -----------------------------------------------
 
     @GetMapping("/hire-date-range")
     public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByHireDateRange(
@@ -81,6 +114,9 @@ public class EmployeesController {
         return ResponseEntity.ok(response);
     }
 
+    // ------------------------------ UPDATE COMPLETE
+    // -----------------------------------------------
+
     @PutMapping("/{id}")
     public ResponseEntity<EmployeesResponseDTO> updateEmployee(@PathVariable Long id,
             @RequestBody EmployeesRequestDTO employeesRequestDTO) {
@@ -88,11 +124,36 @@ public class EmployeesController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // ------------------------------ UPDATE ONLY ONE O MORE
+    // -----------------------------------------------
+
     @PatchMapping("/{id}")
     public ResponseEntity<EmployeesResponseDTO> updateSpecificEmployee(@PathVariable Long id,
             @RequestBody EmployeesRequestDTO employeesRequestDTO) {
         EmployeesResponseDTO response = employeesService.updateEmployee(id, employeesRequestDTO);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    // ------------------------------ DELETE BY ID
+    // -----------------------------------------------
+
+    @DeleteMapping("/{id}")
+
+    public ResponseEntity<MessageResponseDTO> deleteEmployeeByid(@PathVariable Long id) {
+        MessageResponseDTO messageResponseDTO = employeesService.deleteEmployeeByid(id);
+        return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
+
+    }
+
+    // ------------------------------ DELETE BY DOCUMENT NUMBER
+    // -----------------------------------------------
+
+    @DeleteMapping("/documentNumber/{documentNumber}")
+
+    public ResponseEntity<MessageResponseDTO> deleteEmployeeByDocumentNumber(@PathVariable String documentNumber) {
+        MessageResponseDTO messageResponseDTO = employeesService.deleteEmployeeByNumberDocument(documentNumber);
+        return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
+
     }
 
 }
