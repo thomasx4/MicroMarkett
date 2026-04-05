@@ -66,6 +66,12 @@ public class EmployeesController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("active/{active}")
+    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByActive(@PathVariable Boolean active){
+        List<EmployeesResponseDTO> response = employeesService.getEmployyesByActive(active);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @GetMapping("/hire-date-range")
     public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByHireDateRange(
             @RequestParam LocalDate startDate,
