@@ -1,5 +1,8 @@
 package com.gestion.micromarket.dto;
 
-public class SuppliersRequestDTO {
+
+public class SupplierResponseDTO {
+
     
+
 }
