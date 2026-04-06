@@ -1,5 +1,6 @@
 package com.gestion.micromarket.service;
 
-public class SuppliersService {
+public class SupplierService {
+
     
 }

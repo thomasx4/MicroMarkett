@@ -1,5 +1,6 @@
 package com.gestion.micromarket.controller;
 
-public class SuppliersController {
+public class SupplierController {
+
     
 }
