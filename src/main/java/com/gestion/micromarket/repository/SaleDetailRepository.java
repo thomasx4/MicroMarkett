@@ -10,4 +10,5 @@ import com.gestion.micromarket.entity.SaleDetail;
 @Repository
 public interface SaleDetailRepository extends JpaRepository<SaleDetail, Long> {
     List<SaleDetail> findBySaleId(Long saleId);
+    List<SaleDetail> findByProductId(Long productId);
 }
