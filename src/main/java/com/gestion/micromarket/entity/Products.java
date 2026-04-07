@@ -1,5 +1,6 @@
 package com.gestion.micromarket.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,7 +28,7 @@ import lombok.Data;
     private String barcode; 
 
     @Column(nullable = false) 
-    private Double price; 
+    private BigDecimal price; 
 
     @Column(nullable = false) 
     private Long stock; 
