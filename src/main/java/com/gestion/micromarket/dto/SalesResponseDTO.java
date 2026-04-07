@@ -13,6 +13,9 @@ public class SalesResponseDTO {
     private BigDecimal subtotal;
     private BigDecimal vat;
     private BigDecimal total;
-    private EmployeeInfoDTO employee;
+    private Long employeeId;
+    private String employeeName;
+    private String employeeRole;
+    private Boolean employeeActive;
     private List<SaleDetailResponseDTO> saleDetails;
 }

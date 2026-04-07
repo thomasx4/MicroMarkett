@@ -2,6 +2,8 @@ package com.gestion.micromarket.dto;
 
 import lombok.Builder;
 import lombok.Data;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -11,7 +13,7 @@ public class ProductsResponseDTO {
     private Long id;
     private String name;
     private String barcode;
-    private Double price;
+    private BigDecimal price;
     private Long stock;
     private Boolean active;
     private LocalDateTime createdAt;

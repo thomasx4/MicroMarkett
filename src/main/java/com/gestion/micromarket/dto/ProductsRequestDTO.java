@@ -1,5 +1,7 @@
 package com.gestion.micromarket.dto;
 
+import java.math.BigDecimal;
+
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -16,7 +18,7 @@ public class ProductsRequestDTO {
 
     @NotNull(message = "El precio es obligatorio")
     @Positive(message = "El precio debe ser mayor a 0")
-    private Double price;
+    private BigDecimal price;
 
     @NotNull(message = "El stock es obligatorio")
     @PositiveOrZero(message = "El stock no puede ser negativo")
