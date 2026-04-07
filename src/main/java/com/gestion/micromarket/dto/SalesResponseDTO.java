@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.gestion.micromarket.entity.enums.Role;
+
 import lombok.Data;
 
 @Data
@@ -15,7 +17,7 @@ public class SalesResponseDTO {
     private BigDecimal total;
     private Long employeeId;
     private String employeeName;
-    private String employeeRole;
+    private Role employeeRole;
     private Boolean employeeActive;
     private List<SaleDetailResponseDTO> saleDetails;
 }
