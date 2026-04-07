@@ -76,14 +76,8 @@ public class SaleService {
             detail.setSale(savedSale);
             detail.setProduct(product);
             detail.setQuantity(detailReq.getQuantity());
-            detail.setUnitPrice(detailReq.getUnitPrice());
 
-            BigDecimal subtotalDetalle = detailReq.getUnitPrice()
-                    .multiply(BigDecimal.valueOf(detailReq.getQuantity()))
-                    .setScale(2, RoundingMode.HALF_UP);
-            detail.setSubtotal(subtotalDetalle);
 
-            subtotalTotal = subtotalTotal.add(subtotalDetalle);
             saleDetailRepository.save(detail);
 
             product.setStock(product.getStock() - detailReq.getQuantity());
@@ -174,13 +168,8 @@ public class SaleService {
                 detail.setSale(sale);
                 detail.setProduct(product);
                 detail.setQuantity(detailReq.getQuantity());
-                detail.setUnitPrice(detailReq.getUnitPrice());
 
-                BigDecimal subtotalDetalle = detailReq.getUnitPrice()
-                        .multiply(BigDecimal.valueOf(detailReq.getQuantity()))
-                        .setScale(2, RoundingMode.HALF_UP);
-                detail.setSubtotal(subtotalDetalle);
-                subtotalTotal = subtotalTotal.add(subtotalDetalle);
+                        
 
                 saleDetailRepository.save(detail);
 
