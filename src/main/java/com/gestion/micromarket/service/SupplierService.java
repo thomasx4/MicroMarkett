@@ -19,16 +19,16 @@ public class SupplierService {
     private final SupplierRepository supplierRepository;
     private final ProductsRepository productsRepository;
 
-    public SupplierService(SupplierRepository supplierRepository, ProductsRepository productsRepository){
+    public SupplierService(SupplierRepository supplierRepository, ProductsRepository productsRepository) {
         this.supplierRepository = supplierRepository;
         this.productsRepository = productsRepository;
     }
 
-    public List<SupplierResponseDTO> getAll(){
+    public List<SupplierResponseDTO> getAll() {
         List<Supplier> list = supplierRepository.findAll();
         List<SupplierResponseDTO> response = new ArrayList<>();
 
-        for(Supplier supplier : list){
+        for (Supplier supplier : list) {
             SupplierResponseDTO supplierResponseDTO = new SupplierResponseDTO();
             supplierResponseDTO.setId(supplier.getId());
             supplierResponseDTO.setName(supplier.getName());
@@ -43,16 +43,12 @@ public class SupplierService {
         return response;
     }
 
-    public SupplierResponseDTO getById(Long id){
+    public SupplierResponseDTO getById(Long id) {
         Supplier supplier = supplierRepository.findById(id).orElse(null);
-
-        if(supplier == null){
-            return null;
-        }
         SupplierResponseDTO supplierResponseDTO = new SupplierResponseDTO();
         supplierResponseDTO.setId(supplier.getId());
         supplierResponseDTO.setName(supplier.getName());
-        supplierResponseDTO.setTaxId(supplier.getTaxId());  
+        supplierResponseDTO.setTaxId(supplier.getTaxId());
         supplierResponseDTO.setPhone(supplier.getPhone());
         supplierResponseDTO.setAddress(supplier.getAddress());
         supplierResponseDTO.setEmail(supplier.getEmail());
@@ -61,11 +57,15 @@ public class SupplierService {
         return supplierResponseDTO;
     }
 
-    public MessageResponseDTO create(SupplierRequestDTO supplierRequestDTO){
+    public MessageResponseDTO create(SupplierRequestDTO supplierRequestDTO) {
 
-    if(supplierRepository.findByTaxId(supplierRequestDTO.getTaxId()).isPresent()){
-        return new MessageResponseDTO("El proveedor ya existe");
-    }
+        if (supplierRequestDTO.getTaxId() == null) {
+            return new MessageResponseDTO("El NIT es obligatorio, debe ingresarlo");
+        }
+
+        if (supplierRepository.findByTaxId(supplierRequestDTO.getTaxId()).isPresent()) {
+            return new MessageResponseDTO("El NIT ya existe, no puede repetirse: " + supplierRequestDTO.getTaxId());
+        }
 
         Supplier supplier = new Supplier();
         supplier.setName(supplierRequestDTO.getName());
@@ -79,34 +79,47 @@ public class SupplierService {
         return new MessageResponseDTO("Proveedor creado correctamente");
     }
 
-    public MessageResponseDTO update(Long id, SupplierRequestDTO dto){
+    public MessageResponseDTO update(Long id, SupplierRequestDTO dto) {
 
-        Supplier supplier = supplierRepository.findById(id).orElse(null);
+        Supplier supplier = supplierRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("El proveedor no se encunetra con el id: " + id));
 
-        if(supplier == null){
-            return new MessageResponseDTO("Proveedor no encontrado");
-        }
+        if (dto.getTaxId() != null && !dto.getTaxId().trim().isEmpty()) {
 
-        if(!supplier.getTaxId().equals(dto.getTaxId())){
-            if(supplierRepository.findByTaxId(dto.getTaxId()).isPresent()){
-                return new MessageResponseDTO("El NIT ya está en uso");
+            if (supplier.getTaxId() == null || !supplier.getTaxId().equals(dto.getTaxId())) {
+
+                if (supplierRepository.findByTaxId(dto.getTaxId()).isPresent()) {
+                    return new MessageResponseDTO("El NIT ya está en uso por otro proveedor");
+                }
             }
+            supplier.setTaxId(dto.getTaxId());
         }
 
-        supplier.setName(dto.getName());
-        supplier.setTaxId(dto.getTaxId());
-        supplier.setPhone(dto.getPhone());
-        supplier.setAddress(dto.getAddress());
-        supplier.setEmail(dto.getEmail());
+        if (dto.getName() != null) {
+            supplier.setName(dto.getName());
+        }
+
+        if (dto.getPhone() != null) {
+            supplier.setPhone(dto.getPhone());
+        }
+
+        if (dto.getAddress() != null) {
+            supplier.setAddress(dto.getAddress());
+        }
+
+        if (dto.getEmail() != null) {
+            supplier.setEmail(dto.getEmail());
+        }
 
         supplierRepository.save(supplier);
 
         return new MessageResponseDTO("Proveedor actualizado correctamente");
+
     }
 
-    public MessageResponseDTO delete(Long id){
+    public MessageResponseDTO delete(Long id) {
         Supplier supplier = supplierRepository.findById(id).orElse(null);
-        if(supplier == null){
+        if (supplier == null) {
             return new MessageResponseDTO("Proveedor no encontrado");
         }
         supplierRepository.deleteById(id);
@@ -153,6 +166,38 @@ public class SupplierService {
                 .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
 
         return supplier.getProducts();
+    }
+
+    // ENTRADA AL ALMACEN
+
+    @Transactional
+    public MessageResponseDTO warehouseEntry(WarehouseEntryDTO dto) {
+
+        // BUSCAR PRODUCTO
+        Products product = productsRepository.findById(dto.getProductId())
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + dto.getProductId()));
+
+        // BUSCAR PROVEEDOR
+        Supplier supplier = supplierRepository.findById(dto.getSupplierId())
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con ID: " + dto.getSupplierId()));
+
+        // VALIDAR CANTIDAD
+        if (dto.getQuantity() <= 0) {
+            throw new RuntimeException("La cantidad debe ser mayor a 0");
+        }
+
+        // SUMAR STOCK
+        Long stockAnterior = product.getStock();
+        Long nuevoStock = stockAnterior + dto.getQuantity();
+        product.setStock(nuevoStock);
+        productsRepository.save(product);
+
+        return new MessageResponseDTO("Entrada de almacen realizada correctamente: "
+                + "Producto: " + product.getName() + ","
+                + "Stock anterior: " + stockAnterior + ", "
+                + "Cantidad agregada: " + dto.getQuantity() + ", "
+                + "Proveedor: " + supplier.getName() + ", "
+                + "Nuevo stock: " + nuevoStock);
     }
 
 }
