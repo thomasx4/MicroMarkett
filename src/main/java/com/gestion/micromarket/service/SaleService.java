@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.dto.SaleDetailRequestDTO;
+import com.gestion.micromarket.dto.SaleDetailResponseDTO;
 import com.gestion.micromarket.dto.SalesRequestDTO;
 import com.gestion.micromarket.dto.SalesResponseDTO;
 import com.gestion.micromarket.entity.Employees;
@@ -84,13 +85,10 @@ public class SaleService {
                     "El empleado no puede realizar la venta, solo el Cajero lo puede realizar ya que el rol del empleado es: "
                             + employee.getRole());
         }
-        saleDetailRepository.saveAll(saleDetail);
 
         if (salesRequestDTO.getSaleDetails() == null || salesRequestDTO.getSaleDetails().isEmpty()) {
             throw new RuntimeException("La venta debe de tener por lo menos un producto");
         }
-
-        
 
         for (SaleDetailRequestDTO saleDetailRequestDTO : salesRequestDTO.getSaleDetails()) {
             Products product = productRepository.findById(saleDetailRequestDTO.getProductId())
@@ -102,7 +100,8 @@ public class SaleService {
             }
 
             if (product.getStock() < saleDetailRequestDTO.getQuantity()) {
-                throw new RuntimeException("La cantidad que pusiste no es suficiente: " + saleDetailRequestDTO.getQuantity()+ " - solo hay disponible: "+ product.getStock());
+                throw new RuntimeException("La cantidad que pusiste no es suficiente: "
+                        + saleDetailRequestDTO.getQuantity() + " - solo hay disponible: " + product.getStock());
 
             }
         }
@@ -159,9 +158,93 @@ public class SaleService {
         return new MessageResponseDTO("La venta fue creada exitosamente con el ID: " + sale.getId());
     }
 
+    // ------------------------------- GET ALL -------------------------------
+
+    public List<SalesResponseDTO> getAllSales() {
+        List<Sales> sales = saleRepository.findAll();
+        List<SalesResponseDTO> listSales = new ArrayList<>();
+
+        for (Sales sale : sales) {
+            listSales.add(listToResponseDTO(sale));
+        }
+
+        return listSales;
+    }
+
     // ------------------------------- GET BY ID -------------------------------
 
-    
+    @Transactional(readOnly = true)
+    public SalesResponseDTO getSaleById(Long id) {
+        Sales sale = saleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("La venta no se encuentra con el id:  " + id));
 
+        return listToResponseDTO(sale);
+    }
+
+    // ------------------------------- PUT -------------------------------
+
+    @Transactional
+    public SalesResponseDTO updateSale(Long id, SalesRequestDTO salesRequestDTO) {
+
+        Sales sale = saleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + id));
+
+        Employees employee = employeesRepository.findById(salesRequestDTO.getEmployeeId())
+                .orElseThrow(() -> new RuntimeException(
+                        "Empleado no encontrado con ID: " + salesRequestDTO.getEmployeeId()));
+        sale.setEmployee(employee);
+
+        List<SaleDetail> oldsaleDetails = saleDetailRepository.findBySaleId(id);
+        saleDetailRepository.deleteAll(oldsaleDetails);
+
+        BigDecimal subtotalTotal = BigDecimal.ZERO;
+        List<SaleDetail> newsaleDetails = new ArrayList<>();
+
+        for (SaleDetailRequestDTO saleDetailRequestDTO : salesRequestDTO.getSaleDetails()) {
+            Products product = productRepository.findById(saleDetailRequestDTO.getProductId())
+                    .orElseThrow(
+                            () -> new RuntimeException(
+                                    "Producto no encontrado con ID: " + saleDetailRequestDTO.getProductId()));
+
+            BigDecimal subtotalDetalle = product.getPrice()
+                    .multiply(BigDecimal.valueOf(saleDetailRequestDTO.getQuantity()))
+                    .setScale(2, RoundingMode.HALF_UP);
+
+            subtotalTotal = subtotalTotal.add(subtotalDetalle);
+
+            SaleDetail detail = new SaleDetail();
+            detail.setSale(sale);
+            detail.setProduct(product);
+            detail.setQuantity(saleDetailRequestDTO.getQuantity());
+            detail.setUnitPrice(product.getPrice());
+
+            newsaleDetails.add(detail);
+        }
+
+        saleDetailRepository.saveAll(newsaleDetails);
+
+        BigDecimal vat = subtotalTotal.multiply(new BigDecimal("0.19")).setScale(2, RoundingMode.HALF_UP);
+        BigDecimal total = subtotalTotal.add(vat).setScale(2, RoundingMode.HALF_UP);
+
+        sale.setSubtotal(subtotalTotal);
+        sale.setVat(vat);
+        sale.setTotal(total);
+
+        Sales updatedSale = saleRepository.save(sale);
+
+        return listToResponseDTO(updatedSale);
+    }
+
+    // -------------------------- DELETE ---------------------------
+    @Transactional
+    public MessageResponseDTO deleteSale(Long id) {
+
+        Sales sale = saleRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Venta no encontrada con ID: " + id));
+
+        saleRepository.delete(sale);
+
+        return new MessageResponseDTO("Venta eliminada correctamente con ID: " + id);
+    }
 
 }
