@@ -15,7 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.Table; 
 import lombok.Data;
 
 @Entity
@@ -33,8 +33,8 @@ public class Products {
     @Column(nullable = false, unique = true, length = 50)
     private String barcode;
 
-    @Column(nullable = false)
-    private BigDecimal price;
+    @Column(nullable = false) 
+    private BigDecimal price; 
 
     @Column(nullable = false)
     private Long stock;
@@ -45,8 +45,8 @@ public class Products {
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY) 
+    @JoinColumn(name = "category_id") 
     private Categories category;
 
     @ManyToMany(mappedBy = "products", fetch = FetchType.LAZY)
