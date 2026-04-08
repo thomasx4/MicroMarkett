@@ -1,12 +1,14 @@
 package com.gestion.micromarket.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 import com.gestion.micromarket.dto.*;
+import com.gestion.micromarket.entity.Supplier;
 import com.gestion.micromarket.service.ProductsService;
 
 @RestController
@@ -53,7 +55,30 @@ public class ProductsController {
     }
 
     @DeleteMapping("/{id}")
-    public MessageResponseDTO delete(@PathVariable Long id) {
-        return service.delete(id);
+    public MessageResponseDTO softDelete(@PathVariable Long id) {
+        return service.softDelete(id);
+    }
+
+    @PatchMapping("/{id}/restore")
+    public MessageResponseDTO restore(@PathVariable Long id) {
+        return service.restore(id);
+    }
+
+    // Endpoints para gestionar proveedores (ManyToMany)
+    @PostMapping("/{productId}/suppliers/{supplierId}")
+    public MessageResponseDTO addSupplier(@PathVariable Long productId, 
+                                        @PathVariable Long supplierId) {
+        return service.addSupplier(productId, supplierId);
+    }
+
+    @DeleteMapping("/{productId}/suppliers/{supplierId}")
+    public MessageResponseDTO removeSupplier(@PathVariable Long productId, 
+                                            @PathVariable Long supplierId) {
+        return service.removeSupplier(productId, supplierId);
+    }
+
+    @GetMapping("/{productId}/suppliers")
+    public Set<Supplier> getSuppliersByProduct(@PathVariable Long productId) {
+        return service.getSuppliersByProduct(productId);
     }
 }

@@ -3,8 +3,10 @@ package com.gestion.micromarket.service;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import com.gestion.micromarket.dto.*;
@@ -17,7 +19,9 @@ public class ProductsService {
 
     private final ProductsRepository repository;
     private final CategoriesRepository categoryRepository;
+    private final SupplierRepository supplierRepository;
 
+    @Transactional
     public MessageResponseDTO create(ProductsRequestDTO dto) {
 
         if (repository.existsByBarcode(dto.getBarcode())) {
@@ -41,59 +45,68 @@ public class ProductsService {
         return new MessageResponseDTO("Producto creado correctamente");
     }
 
+    @Transactional(readOnly = true)
     public List<ProductsResponseDTO> findAll() {
-        return repository.findAll()
+        return repository.findAllByActiveTrue()
                 .stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
     public ProductsResponseDTO findById(Long id) {
-        Products product = repository.findById(id)
+        Products product = repository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
         return toDTO(product);
     }
 
+    @Transactional(readOnly = true)
     public List<ProductsResponseDTO> findByName(String name) {
 
-        List<Products> products = repository.findByNameContainingIgnoreCase(name);
+        List<Products> products = repository.findByNameContainingIgnoreCaseAndActiveTrue(name);
 
         if (products.isEmpty()) {
-            throw new RuntimeException("No se encontraron productos con ese nombre");
+            throw new RuntimeException("No se encontraron productos activos con ese nombre");
         }
 
         return products.stream().map(this::toDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     public ProductsResponseDTO findByBarcode(String barcode) {
 
-        Products product = repository.findByBarcode(barcode)
+        Products product = repository.findByBarcodeAndActiveTrue(barcode)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado con ese código de barras"));
 
         return toDTO(product);
     }
 
+    @Transactional(readOnly = true)
     public List<ProductsResponseDTO> findByCategory(Long categoryId) {
 
-        List<Products> products = repository.findByCategoryId(categoryId);
+        List<Products> products = repository.findByCategoryIdAndActiveTrue(categoryId);
 
         if (products.isEmpty()) {
-            throw new RuntimeException("No hay productos en esa categoría");
+            throw new RuntimeException("No hay productos activos en esa categoría");
         }
 
         return products.stream().map(this::toDTO).toList();
     }
 
-    public MessageResponseDTO delete(Long id) {
+    @Transactional
+    public MessageResponseDTO softDelete(Long id) {
         Products product = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-        repository.delete(product);
+        // Soft delete: cambiar active a false
+        product.setActive(false);
+        repository.save(product);
 
         return new MessageResponseDTO("Producto eliminado correctamente");
     }
 
+    @Transactional
     public MessageResponseDTO update(Long id, ProductsRequestDTO dto) {
 
         Products product = repository.findById(id)
@@ -119,6 +132,58 @@ public class ProductsService {
         return new MessageResponseDTO("Producto actualizado correctamente");
     }
 
+    @Transactional
+    public MessageResponseDTO restore(Long id) {
+        Products product = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        if (product.getActive()) {
+            throw new RuntimeException("El producto ya está activo");
+        }
+
+        product.setActive(true);
+        repository.save(product);
+
+        return new MessageResponseDTO("Producto restaurado correctamente");
+    }
+
+    // Gestion Tabla Puente Product_Supplier
+    @Transactional
+    public MessageResponseDTO addSupplier(Long productId, Long supplierId) {
+        Products product = repository.findByIdAndActiveTrue(productId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        Supplier supplier = supplierRepository.findById(supplierId)
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
+
+        product.getSuppliers().add(supplier);
+        repository.save(product);
+
+        return new MessageResponseDTO("Proveedor agregado al producto correctamente");
+    }
+
+    @Transactional
+    public MessageResponseDTO removeSupplier(Long productId, Long supplierId) {
+        Products product = repository.findByIdAndActiveTrue(productId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        Supplier supplier = supplierRepository.findById(supplierId)
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
+
+        product.getSuppliers().remove(supplier);
+        repository.save(product);
+
+        return new MessageResponseDTO("Proveedor removido del producto correctamente");
+    }
+
+    @Transactional(readOnly = true)
+    public Set<Supplier> getSuppliersByProduct(Long productId) {
+        Products product = repository.findByIdAndActiveTrue(productId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        return product.getSuppliers();
+    }
+
     private ProductsResponseDTO toDTO(Products product) {
         return ProductsResponseDTO.builder()
                 .id(product.getId())
@@ -131,5 +196,4 @@ public class ProductsService {
                 .categoryName(product.getCategory().getName())
                 .build();
     }
-
 }
