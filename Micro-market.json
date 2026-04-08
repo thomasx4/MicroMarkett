@@ -1,0 +1,880 @@
+[
+  {
+    "v": 11,
+    "id": "cmnnse6ol03krj71m9tjckdfr",
+    "name": "System-Suppliers",
+    "folders": [],
+    "requests": [
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n    \"name\": \"Distribuciones SAS\",\n    \"taxId\": \"345568767\",\n    \"phone\": \"300123454343\",\n    \"address\": \"Calle 1273\",\n    \"email\": \"ventas@distribuciones.com\"\n}",
+          "contentType": "application/json"
+        },
+        "name": "POST - CREAR PROVEEDOR",
+        "method": "POST",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/suppliers",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpdlonn03zcfy1mojuecj6o"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n    \"productId\": 4,\n    \"supplierId\": 3,\n    \"quantity\": 20\n}",
+          "contentType": "application/json"
+        },
+        "name": "POST - ALMACEN DE ENTRADA",
+        "method": "POST",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/suppliers/warehouse-entry",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpfbx2a09kgfy1mwy71704c"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER LOS DATOS",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/suppliers",
+        "responses": {},
+        "testScript": "",
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpdmtz703zgfy1mw4fim6ah"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER POR ID",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/suppliers/1",
+        "responses": {},
+        "testScript": "",
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpdncba0407ic1mnipdv1kx"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "DELETE - ELIMINAR PROVEEDOR",
+        "method": "DELETE",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/suppliers/100",
+        "responses": {},
+        "testScript": "",
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpfbkwe064uic1m0477f5zi"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n    \"name\": \"Distribuciones Actualizadas SAS\",\n    \"phone\": \"3112223344\",\n    \"address\": \"Carrera 45 # 67-89\",\n    \"email\": \"nuevoemail@distribuciones.com\"\n}",
+          "contentType": "application/json"
+        },
+        "name": "PUT - ACTUALIZAR PROVEEDOR",
+        "method": "PUT",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/suppliers/1",
+        "responses": {},
+        "testScript": "",
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpfc9mp064xic1mshdp0xwg"
+      }
+    ],
+    "auth": {
+      "authType": "inherit",
+      "authActive": true
+    },
+    "headers": [],
+    "variables": [],
+    "description": null
+  },
+  {
+    "v": 11,
+    "id": "cmndkgvg53tp8gy1m3y3gdjyp",
+    "name": "System-Employees",
+    "folders": [],
+    "requests": [
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n  \"name\": \"Manuel Moreno\",\n  \"documentNumber\": \"1234567\",\n  \"role\": \"administrator\",\n  \"hireDate\": \"2026-01-15\",\n  \"salary\": 2500000\n}",
+          "contentType": "application/json"
+        },
+        "name": "POST - CREAR",
+        "method": "POST",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/employees",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnl53sc102snld1l0b8i9eqe"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER TODOS LOS DATOS",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/employees",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnfcb2ya0i6zij1lt1fm7y8x"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER POR ID",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/employees/1",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnfdakc60r6nh91lq6oe5slh"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER POR NUMERO DOCUMENTO",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/employees/documentNumber/111111111",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnfg4ilf0jmdij1lj0u9o7s3"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER POR ROL",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/employees/role/cashier",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnfh9wxs0rf9h91l5n48h4tu"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET- OBTENER POR RANGO FECHA",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/employees/hire-date-range?startDate=2024-01-01&endDate=2026-01-15",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnfjsxpn0vmhh91lvseiziov"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER POR ACTIVE",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/employees/active/true",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnl7nay005r2g21l5qsfcpjs"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n  \"name\": \"Juan Carlos Pérez\",\n  \"documentNumber\": \"12345678\",\n  \"role\": \"Cashier\",\n  \"hireDate\": \"2024-02-01\",\n  \"salary\": 5800000\n}",
+          "contentType": "application/json"
+        },
+        "name": "PUT - ACTUALIZAR POR ID ",
+        "method": "PUT",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/employees/1",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnfims950vhfh91lo5ybpyyc"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{    \"role\": \"administrator\",\n  \"active\": \"true\"\n}",
+          "contentType": "application/json"
+        },
+        "name": "PATCH - ACTUALIZAR POR ID - DATO INDIVIDUAL",
+        "method": "PATCH",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/employees/2",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnfj6pjr0vl0h91l8hcxjtsn"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "DELETE - ELIMINAR POR ID",
+        "method": "DELETE",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/employees/100",
+        "responses": {},
+        "testScript": "",
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnlbonp6063wg21lf4q833ul"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "DELETE - ELIMINAR POR NUMERO DE DOCUMENTO",
+        "method": "DELETE",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/employees/documentNumber/1234567",
+        "responses": {},
+        "testScript": "",
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnlc1pbw038eld1l48nuxpm3"
+      }
+    ],
+    "auth": {
+      "authType": "inherit",
+      "authActive": true
+    },
+    "headers": [],
+    "variables": [],
+    "description": null
+  },
+  {
+    "v": 11,
+    "id": "cmndkigvd3tpbgy1my2xaungn",
+    "name": "system-categories",
+    "folders": [],
+    "requests": [
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n  \"name\": \"Bebidas alcoholicas\",\n  \"description\": \"Smirnoff\"\n}",
+          "contentType": "application/json"
+        },
+        "name": "POST - CREAR CATEGORIA",
+        "method": "POST",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/categories",
+        "responses": {},
+        "testScript": "",
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpznye105v5fz1l1n5sj9v1"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER LOS DATOS",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/categories",
+        "responses": {},
+        "testScript": "",
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpzor6105v7fz1le0pns8ci"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER POR ID",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/categories/3",
+        "responses": {},
+        "testScript": "",
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpzpv1v05vafz1l981zctnm"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n  \"name\": \"Bebidas alcoholicas\",\n  \"description\": \"Smirnoff, Aguardiente\"\n}",
+          "contentType": "application/json"
+        },
+        "name": "PUT - ACTUALIZAR POR ID",
+        "method": "PUT",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/categories/3",
+        "responses": {},
+        "testScript": "",
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpzrojy062kfz1lyfy5psxm"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "DELETE - ELIMINAR POR ID",
+        "method": "DELETE",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/categories/3",
+        "responses": {},
+        "testScript": "",
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpzsg1v062nfz1lvptem7bi"
+      }
+    ],
+    "auth": {
+      "authType": "inherit",
+      "authActive": true
+    },
+    "headers": [],
+    "variables": [],
+    "description": null
+  },
+  {
+    "v": 11,
+    "id": "cmndm7s6244yuf21m16y940od",
+    "name": "System-Products",
+    "folders": [],
+    "requests": [
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n    \"name\": \"Aceite Girasol\",\n    \"barcode\": \"00000000\",\n    \"price\": 10.99,\n    \"stock\": 20,\n    \"active\": true,\n    \"categoryId\": 2\n}",
+          "contentType": "application/json"
+        },
+        "name": "POST - CREAR PRODUCTO",
+        "method": "POST",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/products",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmno0v4ha0zvgg21lv70n5gta"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "POST - CREAR RELACION PRODUCTO - PROVEEDOR",
+        "method": "POST",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/products/4/suppliers/3",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnpgk7ru09hyic1mk33i38so"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - LISTAR PRODUCTOS ACTIVOS",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/products",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmno0wa490zvkg21lltkn7rz1"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER POR ID PRODUCTO",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/products/1",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmno0x4vn0zvog21lrh8c9syk"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET- OBTENER POR NOMBRE",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/products/name/arroz",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmno0xyxw04kyj71m2i3n6w3c"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER PRODUCTO BARDCODE",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/products/barcode/00000000",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmno0zc9g0zvzg21lop713xbn"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER PRODUCTO POR CATEOGORIA",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/products/category/2",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmno11uam04lbj71mk09neifm"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n    \"name\": \"Arroz Integral\",\n    \"barcode\": \"7891234567A90\",\n    \"price\": 6.99,\n    \"stock\": 80,\n    \"active\": true,\n    \"categoryId\": 1\n}",
+          "contentType": "application/json"
+        },
+        "name": "PUT - ACTUALIZAR POR ID",
+        "method": "PUT",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/products/1",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmno13so904lij71mbp7jsjl8"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "DELETE - ELIMINAR POR ID",
+        "method": "DELETE",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/products/1",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmno16u3h04lqj71mmxxsux6v"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "PATCH - ACTUALIZAR POR ID UNO O VARIOS VALORES",
+        "method": "PATCH",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/products/4/restore",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmno18at80zwjg21lwy15wpgi"
+      }
+    ],
+    "auth": {
+      "authType": "inherit",
+      "authActive": true
+    },
+    "headers": [],
+    "variables": [],
+    "description": null
+  },
+  {
+    "v": 11,
+    "id": "cmnnrfld403jbj71mimm3lvlk",
+    "name": "System-sales",
+    "folders": [],
+    "requests": [
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n    \"employeeId\": 1,\n    \"saleDetails\": [\n        {\n            \"productId\": 1,\n            \"quantity\": 2,\n       \n        },\n        {\n            \"productId\": 2,\n            \"quantity\": 1,\n            \n        },\n        {\n            \"productId\": 3,\n            \"quantity\": 3,\n           \n        }\n    ]\n}",
+          "contentType": "application/json"
+        },
+        "name": "POST - CREAR",
+        "method": "POST",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/sales",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnns4szf03kfj71mdijb5f4b"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER LOS DATOS",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/sales",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnns5vgt0yhxg21l6cqy55qc"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "GET - OBTENER POR ID",
+        "method": "GET",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/sales/2",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnns83u10yi2g21lpxifl5ia"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n    \"employeeId\": 2,\n    \"saleDetails\": [\n        {\n            \"productId\": 4,\n            \"quantity\": 3\n        },\n        {\n            \"productId\": 5,\n            \"quantity\": 2\n        }\n    ]\n}",
+          "contentType": "application/json"
+        },
+        "name": "PUT - ACTUALIZAR POR ID",
+        "method": "PUT",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/sales/4",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnnse6840yihg21lj1b0aaoa"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": null,
+          "contentType": null
+        },
+        "name": "DELETE - ELIMINAR POR ID",
+        "method": "DELETE",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/sales/2",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmnnsv4ot0yjug21lhcdsh1dp"
+      }
+    ],
+    "auth": {
+      "authType": "inherit",
+      "authActive": true
+    },
+    "headers": [],
+    "variables": [],
+    "description": null
+  }
+]

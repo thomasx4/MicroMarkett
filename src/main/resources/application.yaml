@@ -2,9 +2,9 @@ spring:
   application:
     name: micromarket
   datasource:
-    url: jdbc:mysql://hopper.proxy.rlwy.net:54635/railway
+    url: jdbc:mysql://junction.proxy.rlwy.net:53113/railway
     username: root
-    password: kFGarzQcekExuoLiwYqpQKrJMjtfLrwg
+    password: IVYzgzySSkTLjmggoZhHfUCjeDaZJsZI
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
