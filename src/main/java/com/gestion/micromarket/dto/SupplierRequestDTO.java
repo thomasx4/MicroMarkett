@@ -9,7 +9,6 @@ public class SupplierRequestDTO {
     @NotBlank(message = "El nombre es obligatorio")
     private String name;
 
-    @NotBlank(message = "Se requiere identificacion fiscal")
     private String taxId;
 
     private String phone;
