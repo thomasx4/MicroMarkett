@@ -1,7 +1,6 @@
 package com.gestion.micromarket.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,40 +35,29 @@ public class SaleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // ------------------------------- GET ALL -------------------------------
+    @GetMapping("/{id}")
+    public ResponseEntity<SalesResponseDTO> getSaleById(@PathVariable Long id) {
+        SalesResponseDTO salesResponseDTO = saleService.getSaleById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(salesResponseDTO);
+    }
+
     @GetMapping
     public ResponseEntity<List<SalesResponseDTO>> getAllSales() {
-        List<SalesResponseDTO> response = saleService.getAllSales();
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        List<SalesResponseDTO> salesResponseDTOs = saleService.getAllSales();
+        return ResponseEntity.ok(salesResponseDTOs);
     }
 
-    // ------------------------------- GET BY ID -------------------------------
-    @GetMapping("/{id}")
-    public ResponseEntity<Optional<SalesResponseDTO>> getSaleById(@PathVariable Long id) {
-        Optional<SalesResponseDTO> response = saleService.getSaleById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    // ------------------------------- GET BY EMPLOYEE ID
-    // -------------------------------
-    @GetMapping("/employee/{employeeId}")
-    public ResponseEntity<List<SalesResponseDTO>> getSalesByEmployeeId(@PathVariable Long employeeId) {
-        List<SalesResponseDTO> response = saleService.getSalesByEmployeeId(employeeId);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    // ------------------------------- UPDATE -------------------------------
     @PutMapping("/{id}")
     public ResponseEntity<SalesResponseDTO> updateSale(@PathVariable Long id,
             @Valid @RequestBody SalesRequestDTO salesRequestDTO) {
-        SalesResponseDTO response = saleService.updateSale(id, salesRequestDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        SalesResponseDTO salesResponseDTO = saleService.updateSale(id, salesRequestDTO);
+        return ResponseEntity.status(HttpStatus.OK).body(salesResponseDTO);
     }
 
-    // ------------------------------- DELETE -------------------------------
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> deleteSaleById(@PathVariable Long id) {
-        MessageResponseDTO response = saleService.deleteSaleById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<MessageResponseDTO> deleteSale(@PathVariable Long id) {
+        MessageResponseDTO response = saleService.deleteSale(id);
+        return ResponseEntity.ok(response);
     }
+
 }

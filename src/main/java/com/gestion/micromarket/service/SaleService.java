@@ -2,13 +2,11 @@ package com.gestion.micromarket.service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.dto.SaleDetailRequestDTO;
@@ -24,7 +22,6 @@ import com.gestion.micromarket.repository.ProductsRepository;
 import com.gestion.micromarket.repository.SaleDetailRepository;
 import com.gestion.micromarket.repository.SaleRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -37,6 +34,37 @@ public class SaleService {
     private final ProductsRepository productRepository;
 
     private static final BigDecimal IVA_RATE = new BigDecimal("0.19");
+
+    private SalesResponseDTO listToResponseDTO(Sales sale) {
+        SalesResponseDTO salesResponseDTO = new SalesResponseDTO();
+        salesResponseDTO.setId(sale.getId());
+        salesResponseDTO.setSaleDate(sale.getSaleDate());
+        salesResponseDTO.setSubtotal(sale.getSubtotal());
+        salesResponseDTO.setVat(sale.getVat());
+        salesResponseDTO.setTotal(sale.getTotal());
+        salesResponseDTO.setEmployeeId(sale.getEmployee().getId());
+        salesResponseDTO.setEmployeeName(sale.getEmployee().getName());
+        salesResponseDTO.setEmployeeRole(sale.getEmployee().getRole());
+        salesResponseDTO.setEmployeeActive(sale.getEmployee().getActive());
+
+        List<SaleDetail> saleDetails = saleDetailRepository.findBySaleId(sale.getId());
+        List<SaleDetailResponseDTO> saleDetailResponseDTOs = new ArrayList<>();
+
+        for (SaleDetail saleDetail : saleDetails) {
+            SaleDetailResponseDTO saleDetailResponseDTO = new SaleDetailResponseDTO();
+            saleDetailResponseDTO.setId(saleDetail.getId());
+            saleDetailResponseDTO.setProductId(saleDetail.getProduct().getId());
+            saleDetailResponseDTO.setProductName(saleDetail.getProduct().getName());
+            saleDetailResponseDTO.setProductBarcode(saleDetail.getProduct().getBarcode());
+            saleDetailResponseDTO.setQuantity(saleDetail.getQuantity());
+            saleDetailResponseDTO.setUnitPrice(saleDetail.getUnitPrice());
+            saleDetailResponseDTOs.add(saleDetailResponseDTO);
+        }
+
+        salesResponseDTO.setSaleDetails(saleDetailResponseDTOs);
+        return salesResponseDTO;
+
+    }
 
     // ------------------------------- CREATE -------------------------------
     @Transactional
@@ -56,6 +84,7 @@ public class SaleService {
                     "El empleado no puede realizar la venta, solo el Cajero lo puede realizar ya que el rol del empleado es: "
                             + employee.getRole());
         }
+        saleDetailRepository.saveAll(saleDetail);
 
         if (salesRequestDTO.getSaleDetails() == null || salesRequestDTO.getSaleDetails().isEmpty()) {
             throw new RuntimeException("La venta debe de tener por lo menos un producto");

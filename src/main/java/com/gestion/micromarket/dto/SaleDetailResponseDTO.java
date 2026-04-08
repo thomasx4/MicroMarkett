@@ -11,5 +11,4 @@ public class SaleDetailResponseDTO {
     private String productName;
     private Integer quantity;
     private BigDecimal unitPrice;
-    private BigDecimal subtotal;
 }
