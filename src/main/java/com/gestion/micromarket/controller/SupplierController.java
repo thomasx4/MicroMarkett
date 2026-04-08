@@ -1,7 +1,9 @@
 package com.gestion.micromarket.controller;
 
 import com.gestion.micromarket.dto.*;
+import com.gestion.micromarket.entity.Products;
 import com.gestion.micromarket.service.SupplierService;
+import java.util.Set;
 
 import jakarta.validation.Valid;
 
@@ -80,5 +82,31 @@ public class SupplierController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new MessageResponseDTO("Error al eliminar el proveedor"));
         }
+    }
+
+    // RELACION DE PROVEEDOR Y PRODUCTO
+
+    // AGREGAR PRODUCTO A PROVEEDOR
+
+    @PostMapping("/{supplierId}/products/{productId}")
+    public MessageResponseDTO addProduct(@PathVariable Long supplierId,@PathVariable Long productId) {
+
+        return supplierService.addProduct(supplierId, productId);
+    }
+
+    // ELIMINAR PRODUCTO
+
+    @DeleteMapping("/{supplierId}/products/{productId}")
+    public MessageResponseDTO removeProduct(@PathVariable Long supplierId, @PathVariable Long productId) {
+
+        return supplierService.removeProduct(supplierId, productId);
+    }
+
+    // OBTENER PRODUCTOS DEL PROVEEDOR
+
+    @GetMapping("/{supplierId}/products")
+    public Set<Products> getProductsBySupplier(@PathVariable Long supplierId) {
+
+        return supplierService.getProductsBySupplier(supplierId);
     }
 }

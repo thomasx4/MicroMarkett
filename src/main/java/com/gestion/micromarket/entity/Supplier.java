@@ -2,8 +2,9 @@ package com.gestion.micromarket.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
+import java.util.Set;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "suppliers")
@@ -30,4 +31,7 @@ public class Supplier {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Products product;
+
+    @ManyToMany(mappedBy = "suppliers")
+    private Set<Products> products = new HashSet<>();
 }

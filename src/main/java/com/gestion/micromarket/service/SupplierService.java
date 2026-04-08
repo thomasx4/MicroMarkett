@@ -1,8 +1,12 @@
 package com.gestion.micromarket.service;
 
 import com.gestion.micromarket.dto.*;
+import com.gestion.micromarket.entity.Products;
 import com.gestion.micromarket.entity.Supplier;
 import com.gestion.micromarket.repository.SupplierRepository;
+import com.gestion.micromarket.repository.ProductsRepository;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -13,9 +17,11 @@ import java.util.List;
 public class SupplierService {
 
     private final SupplierRepository supplierRepository;
+    private final ProductsRepository productsRepository;
 
-    public SupplierService(SupplierRepository supplierRepository){
+    public SupplierService(SupplierRepository supplierRepository, ProductsRepository productsRepository){
         this.supplierRepository = supplierRepository;
+        this.productsRepository = productsRepository;
     }
 
     public List<SupplierResponseDTO> getAll(){
@@ -106,4 +112,47 @@ public class SupplierService {
         supplierRepository.deleteById(id);
         return new MessageResponseDTO("Proveedor eliminado");
     }
+
+    // RELACION DE PROVEEDOR Y PRODUCTO
+
+    // AGREGAR PRODUCTO A PROVEEDOR
+
+    @Transactional
+    public MessageResponseDTO addProduct(Long supplierId, Long productId) {
+        Supplier supplier = supplierRepository.findById(supplierId)
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
+        Products product = productsRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+
+        supplier.getProducts().add(product);
+        supplierRepository.save(supplier);
+
+        return new MessageResponseDTO("Producto agregado al proveedor correctamente");
+    }
+
+    // QUITAR PRODUCTO
+
+    @Transactional
+    public MessageResponseDTO removeProduct(Long supplierId, Long productId) {
+        Supplier supplier = supplierRepository.findById(supplierId)
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
+        Products product = productsRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+        supplier.getProducts().remove(product);
+
+        supplierRepository.save(supplier);
+        return new MessageResponseDTO("Producto removido del proveedor correctamente");
+    }
+
+    // OBTENER PRODUCOS DE UN PROVEEDOR
+
+    @Transactional(readOnly = true)
+    public Set<Products> getProductsBySupplier(Long supplierId) {
+
+        Supplier supplier = supplierRepository.findById(supplierId)
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
+
+        return supplier.getProducts();
+    }
+
 }
