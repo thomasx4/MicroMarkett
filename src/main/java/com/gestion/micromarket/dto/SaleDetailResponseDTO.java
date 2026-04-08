@@ -9,6 +9,7 @@ public class SaleDetailResponseDTO {
     private Long id;
     private Long productId;
     private String productName;
+    private String productBarcode;
     private Integer quantity;
     private BigDecimal unitPrice;
 }

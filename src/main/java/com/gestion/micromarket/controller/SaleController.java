@@ -28,7 +28,6 @@ public class SaleController {
 
     private final SaleService saleService;
 
-    // ------------------------------- CREATE -------------------------------
     @PostMapping
     public ResponseEntity<MessageResponseDTO> createSale(@Valid @RequestBody SalesRequestDTO salesRequestDTO) {
         MessageResponseDTO response = saleService.createSale(salesRequestDTO);
