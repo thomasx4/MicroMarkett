@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/categories")  // Cambia a /api/categories si es necesario
+@RequestMapping("/categories")  
 public class CategoriesController {
     private final CategoriesService categoriesService;
 
@@ -47,14 +47,12 @@ public class CategoriesController {
         }
     }
 
-    // CORRIGE ESTE MÉTODO - Ahora retorna CategoriesResponseDTO en lugar de MessageResponseDTO
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO){
         try {
             CategoriesResponseDTO response = categoriesService.create(categoriesRequestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
-            // Si ya existe la categoría
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new MessageResponseDTO(e.getMessage()));
         } catch (Exception e){

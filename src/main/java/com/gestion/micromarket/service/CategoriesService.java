@@ -51,9 +51,7 @@ public class CategoriesService {
         return categoriesResponseDTO;
     }
 
-    // CORRIGE ESTE MÉTODO - Ahora retorna CategoriesResponseDTO en lugar de MessageResponseDTO
     public CategoriesResponseDTO create(CategoriesRequestDTO categoriesRequestDTO){
-        // Verificar si ya existe
         if(categoriesRepository.findByName(categoriesRequestDTO.getName()).isPresent()){
             throw new RuntimeException("La categoria ya existe");
         }
@@ -61,11 +59,9 @@ public class CategoriesService {
         Categories categories = new Categories();
         categories.setName(categoriesRequestDTO.getName());
         categories.setDescription(categoriesRequestDTO.getDescription());
-        // El createdAt se seteará automáticamente con @PrePersist
 
         Categories savedCategory = categoriesRepository.save(categories);
         
-        // Convertir a response DTO
         CategoriesResponseDTO responseDTO = new CategoriesResponseDTO();
         responseDTO.setId(savedCategory.getId());
         responseDTO.setName(savedCategory.getName());
