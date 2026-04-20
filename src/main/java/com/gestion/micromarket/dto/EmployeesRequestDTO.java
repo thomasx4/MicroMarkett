@@ -17,11 +17,20 @@ import lombok.Data;
 @Data
 public class EmployeesRequestDTO {
 
+    /**
+     * Nombre de empleado
+     */
     @NotBlank(message = "El nombre es obligatorio")
     private String name;
+
+    /**
+     * Numero de docu,ento del usuario
+     */
     @NotNull(message = "El numero de documento es obligatorio")
     @Size(min = 5, max = 10, message = "El numero de documento debe tener entre 5 y 10 caracteres")
     private String documentNumber;
+
+    
     @NotNull(message = "El rol es obligatorio")
     private Role role;
     @NotNull(message = "El fecha de contratacion es obligatorio")

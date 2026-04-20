@@ -1,0 +1,19 @@
+si vamos a crear carpetas dtos mejor detaladas, las debemos d ehacer por tablas o entitys que se requieran, por ejemplo:
+
+/ dto
+    /
+
+
+
+cuando se creae una rama normal por ej: feature/conf-ventas, cuando termines esta tarea por compellto se debe de eliminar la rama, pero si en dado caso se debe de corregir algo se vuelve a crear la rama pero de esta forma: fix/conf-ventas,
+
+feat: se hace sistema de ventas con tarjetas
+fix: se corrije tarjetas mastercard a la hora pagar
+
+refactor: re refactoriza el codigo que no cambie funcionalidad, si no codigo
+docs: cuando vayamos a comentar el codigo si se nos llega a olvidar el codigo, (/** *)
+
+todas la importaciones que hagamos deben de ir en orden, las importaciones de spring boot deben de ir primero, luego van los paquetes del propio proyect
+
+
+la carpet enums, debe de ir afuera como las otras
