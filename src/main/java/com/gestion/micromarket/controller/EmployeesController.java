@@ -30,10 +30,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/employees")
 public class EmployeesController {
+
+    /** Servicio de usuarios */
     private final EmployeesService employeesService;
 
     // ------------------------------- CREATE -------------------------------
-
+    /**
+     * 
+     * @param employeesRequestDTO datos para crear un usuario (este tipo de comentario es paera codgio sencillo cunado no es complejo)
+     * @return MessageResponseDTO
+     */
     @PostMapping()
     public ResponseEntity<MessageResponseDTO> createEmplyees(
             @Valid @RequestBody EmployeesRequestDTO employeesRequestDTO) {
@@ -42,6 +48,7 @@ public class EmployeesController {
     }
 
     // ------------------------------- GET ALL ----------------------------------
+    /** Este codigo es para obtener todos los empleados (este tipo de comentario es cuando el codigo es coplejo y debe de ser explicado detalladamente) */
     @GetMapping()
     public ResponseEntity<List<EmployeesResponseDTO>> getAllEmployees() {
         try {
