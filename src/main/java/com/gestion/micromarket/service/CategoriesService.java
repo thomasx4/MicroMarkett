@@ -6,19 +6,26 @@ import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.entity.Categories;
 import com.gestion.micromarket.repository.CategoriesRepository;
 
+import lombok.RequiredArgsConstructor;
+
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CategoriesService {
+    /**
+     * Repositorio de categoria
+     */
     private final CategoriesRepository categoriesRepository;
 
-    public CategoriesService(CategoriesRepository categoriesRepository){
-        this.categoriesRepository = categoriesRepository;
-    }
-
+    /**
+     * Obtiene todas las categorias
+     * 
+     * @return Lista de categorias convertidas a DTO de respuesta 
+     */
     public List<CategoriesResponseDTO> getAll(){
         List<Categories> list = categoriesRepository.findAll();
         List<CategoriesResponseDTO> response = new ArrayList<>();
@@ -35,6 +42,12 @@ public class CategoriesService {
         return response;
     }
 
+    /**
+     * Obtiene una categoria por su Id
+     * 
+     * @param id
+     * @return Categoria convertida a DTO de respuesta y si no existe null
+     */
     public CategoriesResponseDTO getById(Long id){
         Categories categories = categoriesRepository.findById(id).orElse(null);
 
@@ -51,6 +64,12 @@ public class CategoriesService {
         return categoriesResponseDTO;
     }
 
+    /**
+     * Crea una nueva Categoria
+     * 
+     * @param categoriesRequestDTO
+     * @return Categoria creada convertida a DTO de respuesta
+     */
     public CategoriesResponseDTO create(CategoriesRequestDTO categoriesRequestDTO){
         if(categoriesRepository.findByName(categoriesRequestDTO.getName()).isPresent()){
             throw new RuntimeException("La categoria ya existe");
@@ -71,6 +90,13 @@ public class CategoriesService {
         return responseDTO;
     }
 
+    /**
+     * Actualiza una categoria existente
+     * 
+     * @param id
+     * @param categoriesRequestDTO
+     * @return Mensaje indicando el resultado de la operacion
+     */
     public MessageResponseDTO update(Long id, CategoriesRequestDTO categoriesRequestDTO){
         Categories categories = categoriesRepository.findById(id).orElse(null);
         
@@ -83,6 +109,12 @@ public class CategoriesService {
         return new MessageResponseDTO("Categoria actualizada");
     }
 
+    /**
+     * Elimina una categoria por su Id 
+     * 
+     * @param id
+     * @return Mensaje indicando el resultado de la operacion
+     */
     public MessageResponseDTO delete(Long id){
         Categories categories = categoriesRepository.findById(id).orElse(null);
         if(categories == null){
