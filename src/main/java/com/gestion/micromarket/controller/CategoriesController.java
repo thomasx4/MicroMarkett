@@ -6,6 +6,7 @@ import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.service.CategoriesService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +15,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/categories")  
 public class CategoriesController {
+    /**
+     * Servicio de categoria
+     */
     private final CategoriesService categoriesService;
 
-    public CategoriesController(CategoriesService categoriesService){
-        this.categoriesService = categoriesService;
-    }
-
+    /**
+     * Obtiene todas las categorias
+     * 
+     * @return Lista de categorias
+     */
     @GetMapping
     public ResponseEntity<List<CategoriesResponseDTO>> getAll(){
         try {
@@ -33,6 +39,12 @@ public class CategoriesController {
         }
     }
 
+    /**
+     * Obtiene una categoria por su Id 
+     * 
+     * @param id
+     * @return Categoria encontrada o si no existe error 404
+     */
     @GetMapping("/{id}")
     public ResponseEntity<CategoriesResponseDTO> getById(@PathVariable Long id){
         try {
@@ -47,6 +59,12 @@ public class CategoriesController {
         }
     }
 
+    /**
+     * Crea una nueva Categoria
+     * 
+     * @param categoriesRequestDTO
+     * @return Categoria creada o mensaje de error 
+     */
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO){
         try {
@@ -62,6 +80,13 @@ public class CategoriesController {
         }
     }
 
+    /**
+     * Actualiza una categoria
+     * 
+     * @param id
+     * @param categoriesRequestDTO
+     * @return Mensaje de exito o error
+     */
     @PutMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> update(@PathVariable Long id, @Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO){
         try {
@@ -77,6 +102,12 @@ public class CategoriesController {
         }
     }
 
+    /**
+     * Elimina una categoria por si Id
+     * 
+     * @param id
+     * @return Mensaje de exito error
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id){
         try {
