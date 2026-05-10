@@ -4,7 +4,7 @@ package com.gestion.micromarket.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.gestion.micromarket.entity.enums.Role;
+import com.gestion.micromarket.enums.Role;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
