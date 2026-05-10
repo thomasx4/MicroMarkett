@@ -108,7 +108,7 @@ public class EmployeesController {
     }
 
     /**
-     * Obtiene los empleados filtrados por su estado de actividad
+     * Obtiene los empleados por su estado de actividad
      * 
      * @param active puede ser activo=true o inactivo=false
      * @return List<EmployeesResponseDTO> lista de empleados con el estado específico (201)
