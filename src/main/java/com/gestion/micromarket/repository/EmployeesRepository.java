@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.gestion.micromarket.entity.Employees;
-import com.gestion.micromarket.entity.enums.Role;
+import com.gestion.micromarket.enums.Role;
 
 @Repository
 public interface EmployeesRepository extends JpaRepository<Employees, Long> {

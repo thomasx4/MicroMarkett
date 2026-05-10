@@ -12,7 +12,7 @@ import com.gestion.micromarket.dto.EmployeesRequestDTO;
 import com.gestion.micromarket.dto.EmployeesResponseDTO;
 import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.entity.Employees;
-import com.gestion.micromarket.entity.enums.Role;
+import com.gestion.micromarket.enums.Role;
 import com.gestion.micromarket.repository.EmployeesRepository;
 
 import lombok.RequiredArgsConstructor;

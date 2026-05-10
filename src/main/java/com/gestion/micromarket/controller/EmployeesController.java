@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.gestion.micromarket.dto.EmployeesRequestDTO;
 import com.gestion.micromarket.dto.EmployeesResponseDTO;
 import com.gestion.micromarket.dto.MessageResponseDTO;
-import com.gestion.micromarket.entity.enums.Role;
+import com.gestion.micromarket.enums.Role;
 import com.gestion.micromarket.service.EmployeesService;
 
 import jakarta.validation.Valid;
@@ -48,7 +48,7 @@ public class EmployeesController {
     }
 
     // ------------------------------- GET ALL ----------------------------------
-    /** Este codigo es para obtener todos los empleados (este tipo de comentario es cuando el codigo es coplejo y debe de ser explicado detalladamente) */
+    
     @GetMapping()
     public ResponseEntity<List<EmployeesResponseDTO>> getAllEmployees() {
         try {
