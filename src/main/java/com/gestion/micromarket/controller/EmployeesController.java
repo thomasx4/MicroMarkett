@@ -23,6 +23,7 @@ import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.enums.Role;
 import com.gestion.micromarket.service.EmployeesService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -42,15 +43,22 @@ public class EmployeesController {
      */
     @PostMapping()
     public ResponseEntity<MessageResponseDTO> createEmplyees(
-            @Valid @RequestBody EmployeesRequestDTO employeesRequestDTO) {
-            try {
-                MessageResponseDTO messageResponseDTO = employeesService.createrEmployees(employeesRequestDTO);
-                return ResponseEntity.status(HttpStatus.CREATED).body(messageResponseDTO);
-            } catch (Exception e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new MessageResponseDTO(e.getMessage()));
-            }
-        
+            @Valid @RequestBody EmployeesRequestDTO employeesRequestDTO,
+            HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso para crear empleados"));
+        }
+
+        try {
+            MessageResponseDTO messageResponseDTO = employeesService.createrEmployees(employeesRequestDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(messageResponseDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponseDTO(e.getMessage()));
+        }
+
     }
 
     /**
@@ -60,7 +68,12 @@ public class EmployeesController {
      *         algo falla (400)
      */
     @GetMapping()
-    public ResponseEntity<List<EmployeesResponseDTO>> getAllEmployees() {
+    public ResponseEntity<List<EmployeesResponseDTO>> getAllEmployees(HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
         try {
             List<EmployeesResponseDTO> response = employeesService.getAllEmployees();
             return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -76,7 +89,13 @@ public class EmployeesController {
      * @return Optional<EmployeesResponseDTO> Empleado encontrado (201)
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<EmployeesResponseDTO>> getEmployeeById(@PathVariable Long id) {
+    public ResponseEntity<Optional<EmployeesResponseDTO>> getEmployeeById(@PathVariable Long id,
+            HttpServletRequest request) {
+
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         try {
             Optional<EmployeesResponseDTO> response = employeesService.getEmployeeById(id);
             return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -92,14 +111,19 @@ public class EmployeesController {
      * @return EmployeesResponseDTO Empleado encontrado (201)
      */
     @GetMapping("/documentNumber/{documentNumber}")
-    public ResponseEntity<EmployeesResponseDTO> getEmployeeByDocumentNumber(@PathVariable String documentNumber) {
+    public ResponseEntity<EmployeesResponseDTO> getEmployeeByDocumentNumber(@PathVariable String documentNumber,
+            HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         try {
             EmployeesResponseDTO response = employeesService.getEmployeeByDocumentNumber(documentNumber);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        
+
     }
 
     /**
@@ -111,7 +135,12 @@ public class EmployeesController {
      * @throws RuntimeException si el valor de (rol) no es válido
      */
     @GetMapping("/role/{role}")
-    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByRole(@PathVariable String role) {
+    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByRole(@PathVariable String role,
+            HttpServletRequest request) {
+        String userRole = (String) request.getAttribute("role");
+        if (!"administrator".equals(userRole)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
 
         if (!role.equalsIgnoreCase("administrator") && !role.equalsIgnoreCase("cashier")
                 && !role.equalsIgnoreCase("assistant")) {
@@ -136,7 +165,12 @@ public class EmployeesController {
      * @throws RuntimeException si el valor de (active) no es ni true ni false
      */
     @GetMapping("active/{active}")
-    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByActive(@PathVariable String active) {
+    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByActive(@PathVariable String active,
+            HttpServletRequest request) {
+        String userRole = (String) request.getAttribute("role");
+        if (!"administrator".equals(userRole)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
 
         if (!active.equalsIgnoreCase("true") && !active.equalsIgnoreCase("false")) {
             throw new RuntimeException("El valor debe ser 'true' o 'false', no: " + active);
@@ -148,7 +182,7 @@ public class EmployeesController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-        } 
+        }
     }
 
     /**
@@ -162,7 +196,13 @@ public class EmployeesController {
     @GetMapping("/hire-date-range")
     public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByHireDateRange(
             @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate) {
+            @RequestParam LocalDate endDate,
+            HttpServletRequest request) {
+
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
 
         try {
             List<EmployeesResponseDTO> response = employeesService.getEmployeesByHireDateRange(startDate, endDate);
@@ -181,14 +221,20 @@ public class EmployeesController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<EmployeesResponseDTO> updateEmployee(@PathVariable Long id,
-            @RequestBody EmployeesRequestDTO employeesRequestDTO) {
+            @RequestBody EmployeesRequestDTO employeesRequestDTO,
+            HttpServletRequest request) {
+
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         try {
             EmployeesResponseDTO response = employeesService.updateEmployeeComplete(id, employeesRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-        
+
     }
 
     /**
@@ -201,7 +247,13 @@ public class EmployeesController {
      */
     @PatchMapping("/{id}")
     public ResponseEntity<EmployeesResponseDTO> updateSpecificEmployee(@PathVariable Long id,
-            @RequestBody EmployeesRequestDTO employeesRequestDTO) {
+            @RequestBody EmployeesRequestDTO employeesRequestDTO,
+            HttpServletRequest request) {
+
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         try {
             EmployeesResponseDTO response = employeesService.updateEmployee(id, employeesRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -217,8 +269,12 @@ public class EmployeesController {
      * @return MessageResponseDTO mensaje de confirmación de eliminacion (200)
      */
     @DeleteMapping("/{id}")
-
-    public ResponseEntity<MessageResponseDTO> deleteEmployeeByid(@PathVariable Long id) {
+    public ResponseEntity<MessageResponseDTO> deleteEmployeeByid(@PathVariable Long id, HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso para eliminar empleados"));
+        }
         try {
             MessageResponseDTO messageResponseDTO = employeesService.deleteEmployeeByid(id);
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
@@ -234,8 +290,13 @@ public class EmployeesController {
      * @return MessageResponseDTO Mensaje de confirmación de eliminacion (200)
      */
     @DeleteMapping("/documentNumber/{documentNumber}")
-
-    public ResponseEntity<MessageResponseDTO> deleteEmployeeByDocumentNumber(@PathVariable String documentNumber) {
+    public ResponseEntity<MessageResponseDTO> deleteEmployeeByDocumentNumber(@PathVariable String documentNumber,
+            HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso para eliminar empleados"));
+        }
         try {
             MessageResponseDTO messageResponseDTO = employeesService.deleteEmployeeByNumberDocument(documentNumber);
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
