@@ -23,6 +23,12 @@ public class AuthController {
 
     private final AuthService authService;
 
+    /**
+     * Obtiene mensaje de registro confirmado
+     * 
+     * @param request
+     * @return MessageResponseDTO de registro exitoso (201) o si algo falla (400)
+     */
     @PostMapping("/register")
     public ResponseEntity<MessageResponseDTO> register(@RequestBody RegisterRequestDTO request) {
         try {
@@ -34,6 +40,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Autentica un usuario y devuelve un token JWT si las credenciales son válidas
+     * 
+     * @param request 
+     * @return JwtResponseDTO token (200) si las credenciales son válidas (401) si no lo son
+     */
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDTO> login(@RequestBody LoginRequestDTO request) {
         try {
@@ -44,6 +56,12 @@ public class AuthController {
         }
     }
 
+    /**
+     * Genera un token JWT nuevo a partir de uno válido que aún no ha expirado
+     * 
+     * @param request solicitud HTTP en la que se extrae el header 
+     * @return nuevo token JWT con estado 200, o estado 401 si el header está ausente, mal formado o el token no es válido   
+     */
     @PostMapping("/refresh")
     public ResponseEntity<JwtResponseDTO> refreshToken(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");

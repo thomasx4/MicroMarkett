@@ -15,13 +15,19 @@ public class FilterConfig {
         
         FilterRegistrationBean<JwtValidationFilter> registrationBean = new FilterRegistrationBean<>();
         
-        // Setear el filtro
+        /**
+         * Setear el filtro 
+         */
         registrationBean.setFilter(jwtValidationFilter);
         
-        // Aplicar a todas las rutas
+        /**
+         * Aplicar a todas las rutas
+         */
         registrationBean.addUrlPatterns("/*");
         
-        // Alta prioridad para que se ejecute antes que otros filtros
+        /**
+         * Alta prioridad (HIGHEST_PRECEDENCE) para que se ejecute antes que otros filtros
+         */
         registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
         
         return registrationBean;

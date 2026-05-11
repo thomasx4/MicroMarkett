@@ -17,6 +17,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -52,6 +53,9 @@ public class Employees {
     @Column(name = "role",  nullable = false)
     private Role role;
 
+    @Column(name = "password", nullable = false, length = 255)
+    private String password;
+
     /**
      * Fecha en que el empleado fue contratado
      */
@@ -85,4 +89,8 @@ public class Employees {
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = jakarta.persistence.FetchType.LAZY)
     private List<Sales> sales = new ArrayList<>();
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }

@@ -24,6 +24,17 @@ public class JwtValidationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    /**
+     * Valida el token JWT presente en el header de la solicitud.
+     * Si el token es válido, extrae el email, id y rol del empleado y los adjunta como atributos de la solicitud para que estén disponibles en los controladores
+     * Si el token es inválido, ausente o mal formado, responde con estado 401 y detiene la cadena de filtros
+     *
+     * @param request
+     * @param response
+     * @param filterChain
+     * @throws ServletException si ocurre un error en el procesamiento del filtro
+     * @throws IOException si ocurre un error al escribir la respuesta de error
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
@@ -73,18 +84,25 @@ public class JwtValidationFilter extends OncePerRequestFilter {
         }
     }
 
+    /**
+     * Define las rutas públicas que no requieren validación de token JWT.
+     * Cualquier solicitud cuya URI comience con /auth/login ,
+     * /auth/register o /auth/refresh omite este filtro.
+     */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
         String contextPath = request.getContextPath();
 
-        // Rutas públicas que no requieren autenticación
         return path.startsWith(contextPath + "/auth/login") ||
                 path.startsWith(contextPath + "/auth/register") ||
                 path.startsWith(contextPath + "/auth/refresh");
     }
 
-    // Necesitamos importar Map
+    /**
+     * Clase auxiliar para construir mapas de un solo par clave-valor en las respuestas de error.
+     * Evita el uso directo de java.util.Map#of por compatibilidad con el serializador.
+     */
     private static class Map {
         static java.util.Map<String, String> of(String key, String value) {
             return java.util.Collections.singletonMap(key, value);

@@ -26,15 +26,19 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
-    // Registro de nuevo empleado (solo para administradores desde el backend)
+    /**
+     * Registra un nuevo empleado, solo admins puede hacerlo desde el backend
+     * 
+     * @param request recibe datos del empleado a registrar, documento, rol y contrseña
+     * @return mensaje de confirmación de registro
+     * @throws RuntimeException si el número de docuemnto ingresado ya está registrado, si el rol es inválido
+     */
     public MessageResponseDTO register(RegisterRequestDTO request) {
-        
-        // Verificar si el documento ya existe
+       
         if (employeesRepository.findByDocumentNumber(request.getDocumentNumber()).isPresent()) {
             throw new RuntimeException("El número de documento ya está registrado: " + request.getDocumentNumber());
         }
 
-        // Validar que el rol sea válido
         Role role;
         try {
             role = Role.valueOf(request.getRole().toLowerCase());
@@ -57,7 +61,14 @@ public class AuthService {
         return new MessageResponseDTO("Empleado registrado exitosamente");
     }
 
-    // Login de empleado
+    /**
+     * Autentica un empleado verificando su número de documento, contraseña y estado activo
+     * Si las credenciales son válidas genera y devuelve un token JWT
+     * 
+     * @param request
+     * @return token JWT junto con el rol y nombre del empleado autenticado
+     * @throws RuntimeException si el numero de documento ingresado aún no esta registrado, la contraseña es incorrecta o el empleado está inactiv
+     */
     public JwtResponseDTO login(LoginRequestDTO request) {
         
         Optional<Employees> employeeOpt = employeesRepository.findByDocumentNumber(request.getDocumentNumber());
@@ -86,7 +97,14 @@ public class AuthService {
         return new JwtResponseDTO(jwt, employee.getRole().name(), employee.getName());
     }
 
-    // Refrescar token
+    /**
+     * Genera un nuevo token a partir de uno válido
+     * 
+     * @param token 
+     * @return nuevo token JWT 
+     * @throws RuntimeException si el empleado no ha sido encontrado
+     * @throws Exception si el token es inválido
+     */
     public JwtResponseDTO refreshToken(String token) throws Exception {
         String newToken = jwtService.refreshToken(token);
         String role = jwtService.extractRole(token);

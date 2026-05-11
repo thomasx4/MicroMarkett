@@ -17,7 +17,7 @@ import com.gestion.micromarket.entity.Employees;
 import com.gestion.micromarket.entity.Products;
 import com.gestion.micromarket.entity.SaleDetail;
 import com.gestion.micromarket.entity.Sales;
-import com.gestion.micromarket.entity.enums.Role;
+import com.gestion.micromarket.enums.Role;
 import com.gestion.micromarket.repository.EmployeesRepository;
 import com.gestion.micromarket.repository.ProductsRepository;
 import com.gestion.micromarket.repository.SaleDetailRepository;
