@@ -4,6 +4,9 @@ import com.gestion.micromarket.dto.*;
 import com.gestion.micromarket.entity.Products;
 import com.gestion.micromarket.entity.Supplier;
 import com.gestion.micromarket.repository.SupplierRepository;
+
+import lombok.RequiredArgsConstructor;
+
 import com.gestion.micromarket.repository.ProductsRepository;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Set;
@@ -14,16 +17,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class SupplierService {
 
+    /**
+     * Repositorio de proveedores
+     */
     private final SupplierRepository supplierRepository;
+
+    /**
+     * Repositorio de productos
+     */
     private final ProductsRepository productsRepository;
 
-    public SupplierService(SupplierRepository supplierRepository, ProductsRepository productsRepository) {
-        this.supplierRepository = supplierRepository;
-        this.productsRepository = productsRepository;
-    }
 
+    /**
+     * Obtiene todos los proveedores
+     * 
+     * @return Lista de proveedores convertidos a DTO de rerspuesta
+     */
     public List<SupplierResponseDTO> getAll() {
         List<Supplier> list = supplierRepository.findAll();
         List<SupplierResponseDTO> response = new ArrayList<>();
@@ -43,6 +55,12 @@ public class SupplierService {
         return response;
     }
 
+    /**
+     * Obtiene proveedor por Id 
+     * 
+     * @param id
+     * @return Proveedor convertido a proveedor de repuesta
+     */
     public SupplierResponseDTO getById(Long id) {
         Supplier supplier = supplierRepository.findById(id).orElse(null);
         SupplierResponseDTO supplierResponseDTO = new SupplierResponseDTO();
@@ -57,6 +75,13 @@ public class SupplierService {
         return supplierResponseDTO;
     }
 
+
+    /**
+     * Crea un nuevo proveedor
+     * 
+     * @param supplierRequestDTO
+     * @return Mensaje indicando el resultad de la operacion
+     */
     public MessageResponseDTO create(SupplierRequestDTO supplierRequestDTO) {
 
         if (supplierRequestDTO.getTaxId() == null) {
@@ -79,6 +104,13 @@ public class SupplierService {
         return new MessageResponseDTO("Proveedor creado correctamente");
     }
 
+    /**
+     * Actualiza un proveedor existente
+     * 
+     * @param id
+     * @param dto
+     * @return Mensaje indicando el resulado de la operacion
+     */
     public MessageResponseDTO update(Long id, SupplierRequestDTO dto) {
 
         Supplier supplier = supplierRepository.findById(id)
@@ -117,6 +149,13 @@ public class SupplierService {
 
     }
 
+
+    /**
+     * Elimina un proveedor por su Id
+     * 
+     * @param id
+     * @return Mensaje indicando el resultado de la operacion
+     */
     public MessageResponseDTO delete(Long id) {
         Supplier supplier = supplierRepository.findById(id).orElse(null);
         if (supplier == null) {
@@ -126,10 +165,13 @@ public class SupplierService {
         return new MessageResponseDTO("Proveedor eliminado");
     }
 
-    // RELACION DE PROVEEDOR Y PRODUCTO
-
-    // AGREGAR PRODUCTO A PROVEEDOR
-
+    /**
+     * Agrega un producto a un proveedor
+     * 
+     * @param supplierId
+     * @param productId
+     * @return Mensaje indicando el resultado de la operacion
+     */
     @Transactional
     public MessageResponseDTO addProduct(Long supplierId, Long productId) {
         Supplier supplier = supplierRepository.findById(supplierId)
@@ -143,8 +185,13 @@ public class SupplierService {
         return new MessageResponseDTO("Producto agregado al proveedor correctamente");
     }
 
-    // QUITAR PRODUCTO
-
+    /**
+     * Remueve un producto a un proveedor
+     *  
+     * @param supplierId
+     * @param productId
+     * @return Mensaje indicando el resultado de la operacion
+     */
     @Transactional
     public MessageResponseDTO removeProduct(Long supplierId, Long productId) {
         Supplier supplier = supplierRepository.findById(supplierId)
@@ -157,8 +204,13 @@ public class SupplierService {
         return new MessageResponseDTO("Producto removido del proveedor correctamente");
     }
 
-    // OBTENER PRODUCOS DE UN PROVEEDOR
 
+    /**
+     * Obtiene todos los productos asociadfos a un proveedor
+     * 
+     * @param supplierId
+     * @return Conjunto de productos del proveedor
+     */
     @Transactional(readOnly = true)
     public Set<Products> getProductsBySupplier(Long supplierId) {
 
@@ -168,25 +220,38 @@ public class SupplierService {
         return supplier.getProducts();
     }
 
-    // ENTRADA AL ALMACEN
 
+    /**
+     * Registra una entrada de productos al almacén, aumentando el stock
+     * 
+     * @param dto
+     * @return Mensaje detallado con la información de la operación
+     */
     @Transactional
     public MessageResponseDTO warehouseEntry(WarehouseEntryDTO dto) {
 
-        // BUSCAR PRODUCTO
+        /**
+         * Buscar producto
+         */
         Products product = productsRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado con ID: " + dto.getProductId()));
 
-        // BUSCAR PROVEEDOR
+        /**
+         * Buscar proveedor
+         */
         Supplier supplier = supplierRepository.findById(dto.getSupplierId())
                 .orElseThrow(() -> new RuntimeException("Proveedor no encontrado con ID: " + dto.getSupplierId()));
 
-        // VALIDAR CANTIDAD
+        /**
+         * Validar cantidad
+         */
         if (dto.getQuantity() <= 0) {
             throw new RuntimeException("La cantidad debe ser mayor a 0");
         }
 
-        // SUMAR STOCK
+        /**
+         * Sumar stock
+         */
         Long stockAnterior = product.getStock();
         Long nuevoStock = stockAnterior + dto.getQuantity();
         product.setStock(nuevoStock);
