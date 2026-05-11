@@ -1,4 +1,4 @@
-package com.gestion.micromarket.util;
+package com.gestion.micromarket;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
