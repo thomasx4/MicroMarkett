@@ -5,6 +5,7 @@ import com.gestion.micromarket.dto.CategoriesResponseDTO;
 import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.service.CategoriesService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -16,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/categories")  
+@RequestMapping("/categories")
 public class CategoriesController {
     /**
      * Servicio de categoria
@@ -29,31 +30,41 @@ public class CategoriesController {
      * @return Lista de categorias
      */
     @GetMapping
-    public ResponseEntity<List<CategoriesResponseDTO>> getAll(){
+    public ResponseEntity<List<CategoriesResponseDTO>> getAll(HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
         try {
             List<CategoriesResponseDTO> list = categoriesService.getAll();
             return ResponseEntity.status(HttpStatus.OK).body(list);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
     /**
-     * Obtiene una categoria por su Id 
+     * Obtiene una categoria por su Id
      * 
      * @param id
      * @return Categoria encontrada o si no existe error 404
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CategoriesResponseDTO> getById(@PathVariable Long id){
+    public ResponseEntity<CategoriesResponseDTO> getById(@PathVariable Long id, HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role) && !"assistant".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
+
         try {
             CategoriesResponseDTO reponse = categoriesService.getById(id);
-            if(reponse == null){
+            if (reponse == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
             return ResponseEntity.status(HttpStatus.OK).body(reponse);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -63,20 +74,27 @@ public class CategoriesController {
      * Crea una nueva Categoria
      * 
      * @param categoriesRequestDTO
-     * @return Categoria creada o mensaje de error 
+     * @return Categoria creada o mensaje de error
      */
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO){
+    public ResponseEntity<?> create(@Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO,
+            HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso"));
+        }
+
         try {
             CategoriesResponseDTO response = categoriesService.create(categoriesRequestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new MessageResponseDTO(e.getMessage()));
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new MessageResponseDTO("Error al crear la categoria: " + e.getMessage()));
+                    .body(new MessageResponseDTO("Error: " + e.getMessage()));
         }
     }
 
@@ -88,17 +106,24 @@ public class CategoriesController {
      * @return Mensaje de exito o error
      */
     @PutMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> update(@PathVariable Long id, @Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO){
+    public ResponseEntity<MessageResponseDTO> update(@PathVariable Long id,
+            @Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO, HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso"));
+        }
+
         try {
             MessageResponseDTO messageResponseDTO = categoriesService.update(id, categoriesRequestDTO);
-            if(messageResponseDTO.getMessage().equals("Categoria no encontrada")) {
+            if (messageResponseDTO.getMessage().equals("Categoria no encontrada")) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponseDTO);
             }
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new MessageResponseDTO("Error al actualizar la categoria: " + e.getMessage()));
+                    .body(new MessageResponseDTO("Error: " + e.getMessage()));
         }
     }
 
@@ -109,17 +134,23 @@ public class CategoriesController {
      * @return Mensaje de exito error
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id){
+    public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id, HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso"));
+        }
+
         try {
             MessageResponseDTO messageResponseDTO = categoriesService.delete(id);
-            if(messageResponseDTO.getMessage().equals("Categoria no encontrada")) {
+            if (messageResponseDTO.getMessage().equals("Categoria no encontrada")) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponseDTO);
             }
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
-        } catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new MessageResponseDTO("Error al eliminar la categoria: " + e.getMessage()));
+                    .body(new MessageResponseDTO("Error: " + e.getMessage()));
         }
     }
 }
