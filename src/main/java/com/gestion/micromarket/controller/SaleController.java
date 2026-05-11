@@ -18,6 +18,7 @@ import com.gestion.micromarket.dto.SalesRequestDTO;
 import com.gestion.micromarket.dto.SalesResponseDTO;
 import com.gestion.micromarket.service.SaleService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -35,7 +36,13 @@ public class SaleController {
      * @return Respuesta con mensaje de éxito o error
      */
     @PostMapping
-    public ResponseEntity<MessageResponseDTO> createSale(@Valid @RequestBody SalesRequestDTO salesRequestDTO) {
+    public ResponseEntity<MessageResponseDTO> createSale(@Valid @RequestBody SalesRequestDTO salesRequestDTO,
+            HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role) && !"cashier".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso. Solo administradores y cajeros"));
+        }
         try {
             MessageResponseDTO response = saleService.createSale(salesRequestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -51,7 +58,11 @@ public class SaleController {
      * @return Datos de la venta encontrada
      */
     @GetMapping("/{id}")
-    public ResponseEntity<SalesResponseDTO> getSaleById(@PathVariable Long id) {
+    public ResponseEntity<SalesResponseDTO> getSaleById(@PathVariable Long id, HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (role == null) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         try {
             SalesResponseDTO salesResponseDTO = saleService.getSaleById(id);
             return ResponseEntity.status(HttpStatus.OK).body(salesResponseDTO);
@@ -66,7 +77,11 @@ public class SaleController {
      * @return Lista de todas las ventas
      */
     @GetMapping
-    public ResponseEntity<List<SalesResponseDTO>> getAllSales() {
+    public ResponseEntity<List<SalesResponseDTO>> getAllSales(HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         try {
             List<SalesResponseDTO> salesResponseDTOs = saleService.getAllSales();
             return ResponseEntity.ok(salesResponseDTOs);
@@ -78,13 +93,18 @@ public class SaleController {
     /**
      * Actualiza los datos de una venta existente
      *
-     * @param id ID de la venta a actualizar
+     * @param id              ID de la venta a actualizar
      * @param salesRequestDTO Nuevos datos de la venta
      * @return Datos actualizados de la venta
      */
     @PutMapping("/{id}")
     public ResponseEntity<SalesResponseDTO> updateSale(@PathVariable Long id,
-            @Valid @RequestBody SalesRequestDTO salesRequestDTO) {
+            @Valid @RequestBody SalesRequestDTO salesRequestDTO,
+            HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         try {
             SalesResponseDTO salesResponseDTO = saleService.updateSale(id, salesRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(salesResponseDTO);
@@ -100,7 +120,12 @@ public class SaleController {
      * @return Mensaje confirmando la eliminación
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> deleteSale(@PathVariable Long id) {
+    public ResponseEntity<MessageResponseDTO> deleteSale(@PathVariable Long id, HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso"));
+        }
         try {
             MessageResponseDTO response = saleService.deleteSale(id);
             return ResponseEntity.ok(response);
