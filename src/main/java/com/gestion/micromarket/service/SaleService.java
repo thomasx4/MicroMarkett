@@ -36,6 +36,12 @@ public class SaleService {
 
     private static final BigDecimal IVA_RATE = new BigDecimal("0.19");
 
+    /**
+     * Convierte una venta a su formato de respuesta
+     *
+     * @param sale La venta a convertir
+     * @return Los datos de la venta listos para enviar
+     */
     private SalesResponseDTO listToResponseDTO(Sales sale) {
         SalesResponseDTO salesResponseDTO = new SalesResponseDTO();
         salesResponseDTO.setId(sale.getId());
@@ -67,7 +73,13 @@ public class SaleService {
 
     }
 
-    // ------------------------------- CREATE -------------------------------
+    
+    /**
+     * Crea una nueva venta
+     *
+     * @param salesRequestDTO Datos de la venta (empleado, productos, cantidades)
+     * @return Mensaje confirmando que la venta fue creada
+     */
     @Transactional
     public MessageResponseDTO createSale(SalesRequestDTO salesRequestDTO) {
 
@@ -158,8 +170,12 @@ public class SaleService {
         return new MessageResponseDTO("La venta fue creada exitosamente con el ID: " + sale.getId());
     }
 
-    // ------------------------------- GET ALL -------------------------------
-
+    
+    /**
+     * Obtiene todas las ventas registradas
+     *
+     * @return Lista de todas las ventas
+     */
     public List<SalesResponseDTO> getAllSales() {
         List<Sales> sales = saleRepository.findAll();
         List<SalesResponseDTO> listSales = new ArrayList<>();
@@ -171,8 +187,13 @@ public class SaleService {
         return listSales;
     }
 
-    // ------------------------------- GET BY ID -------------------------------
-
+    
+    /**
+     * Busca una venta por su ID
+     *
+     * @param id El número de identificación de la venta
+     * @return Los datos de la venta encontrada
+     */
     @Transactional(readOnly = true)
     public SalesResponseDTO getSaleById(Long id) {
         Sales sale = saleRepository.findById(id)
@@ -181,8 +202,14 @@ public class SaleService {
         return listToResponseDTO(sale);
     }
 
-    // ------------------------------- PUT -------------------------------
-
+    
+    /**
+     * Actualiza los datos de una venta existente
+     *
+     * @param id El ID de la venta a actualizar
+     * @param salesRequestDTO Los nuevos datos de la venta
+     * @return Los datos actualizados de la venta
+     */
     @Transactional
     public SalesResponseDTO updateSale(Long id, SalesRequestDTO salesRequestDTO) {
 
@@ -235,7 +262,13 @@ public class SaleService {
         return listToResponseDTO(updatedSale);
     }
 
-    // -------------------------- DELETE ---------------------------
+    
+    /**
+     * Elimina una venta por su ID
+     *
+     * @param id El ID de la venta a eliminar
+     * @return Mensaje confirmando que la venta fue eliminada
+     */
     @Transactional
     public MessageResponseDTO deleteSale(Long id) {
 
@@ -246,5 +279,6 @@ public class SaleService {
 
         return new MessageResponseDTO("Venta eliminada correctamente con ID: " + id);
     }
+
 
 }
