@@ -21,6 +21,13 @@ public class ProductsService {
     private final CategoriesRepository categoryRepository;
     private final SupplierRepository supplierRepository;
 
+    /**
+     * Crea un nuevo producto en el sistema.
+     *
+     * @param dto Objeto con los datos del producto a crear.
+     * @return MessageResponseDTO con un mensaje indicando que el producto fue creado correctamente
+     * @throws RuntimeException Si el código de barras ya existe o si la categoría especificada no se encuentra
+     */
     @Transactional
     public MessageResponseDTO create(ProductsRequestDTO dto) {
 
@@ -45,6 +52,11 @@ public class ProductsService {
         return new MessageResponseDTO("Producto creado correctamente");
     }
 
+    /**
+     * Obtiene todos los productos activos del sistema.
+     *
+     * @return Lista de objetos ProductsResponseDTO con los datos de los productos activos
+     */
     @Transactional(readOnly = true)
     public List<ProductsResponseDTO> findAll() {
         return repository.findAllByActiveTrue()
@@ -53,6 +65,13 @@ public class ProductsService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Busca un producto por su ID.
+     *
+     * @param id Identificador único del producto
+     * @return ProductsResponseDTO con los datos del producto encontrado
+     * @throws RuntimeException Si no existe un producto activo con el ID proporcionado
+     */
     @Transactional(readOnly = true)
     public ProductsResponseDTO findById(Long id) {
         Products product = repository.findByIdAndActiveTrue(id)
@@ -61,6 +80,13 @@ public class ProductsService {
         return toDTO(product);
     }
 
+    /**
+     * Busca productos por nombre (coincidencia parcial, ignorando mayúsculas/minúsculas).
+     *
+     * @param name Nombre o parte del nombre del producto a buscar
+     * @return Lista de ProductsResponseDTO con los productos activos que coinciden con el nombre
+     * @throws RuntimeException Si no se encuentran productos activos con el nombre especificado
+     */
     @Transactional(readOnly = true)
     public List<ProductsResponseDTO> findByName(String name) {
 
@@ -73,6 +99,13 @@ public class ProductsService {
         return products.stream().map(this::toDTO).toList();
     }
 
+    /**
+     * Busca un producto por su código de barras.
+     *
+     * @param barcode Código de barras único del producto
+     * @return ProductsResponseDTO con los datos del producto encontrado
+     * @throws RuntimeException Si no existe un producto activo con el código de barras proporcionado
+     */
     @Transactional(readOnly = true)
     public ProductsResponseDTO findByBarcode(String barcode) {
 
@@ -82,6 +115,13 @@ public class ProductsService {
         return toDTO(product);
     }
 
+    /**
+     * Obtiene todos los productos activos pertenecientes a una categoría específica.
+     *
+     * @param categoryId Identificador de la categoría
+     * @return Lista de ProductsResponseDTO con los productos activos de la categoría
+     * @throws RuntimeException Si no hay productos activos en la categoría especificada
+     */
     @Transactional(readOnly = true)
     public List<ProductsResponseDTO> findByCategory(Long categoryId) {
 
@@ -94,18 +134,32 @@ public class ProductsService {
         return products.stream().map(this::toDTO).toList();
     }
 
+    /**
+     * Realiza un borrado lógico de un producto, cambiando su estado activo a falso.
+     *
+     * @param id Identificador del producto a eliminar
+     * @return MessageResponseDTO con un mensaje indicando que el producto fue eliminado correctamente
+     * @throws RuntimeException Si no se encuentra un producto con el ID proporcionado
+     */
     @Transactional
     public MessageResponseDTO softDelete(Long id) {
         Products product = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
-        // Soft delete: cambiar active a false
         product.setActive(false);
         repository.save(product);
 
         return new MessageResponseDTO("Producto eliminado correctamente");
     }
 
+    /**
+     * Actualiza los datos de un producto existente.
+     *
+     * @param id Identificador del producto a actualizar
+     * @param dto Objeto con los nuevos datos del producto
+     * @return MessageResponseDTO con un mensaje indicando que el producto fue actualizado correctamente
+     * @throws RuntimeException Si el producto no existe, si el nuevo código de barras ya está en uso por otro producto, o si la categoría especificada no se encuentra
+     */
     @Transactional
     public MessageResponseDTO update(Long id, ProductsRequestDTO dto) {
 
@@ -132,6 +186,13 @@ public class ProductsService {
         return new MessageResponseDTO("Producto actualizado correctamente");
     }
 
+    /**
+     * Restaura un producto previamente eliminado.
+     *
+     * @param id Identificador del producto a restaurar
+     * @return MessageResponseDTO con un mensaje indicando que el producto fue restaurado correctamente
+     * @throws RuntimeException Si el producto no existe o si ya se encuentra activo
+     */
     @Transactional
     public MessageResponseDTO restore(Long id) {
         Products product = repository.findById(id)
@@ -147,7 +208,14 @@ public class ProductsService {
         return new MessageResponseDTO("Producto restaurado correctamente");
     }
 
-    // Gestion Tabla Puente Product_Supplier
+    /**
+     * Asocia un proveedor existente a un producto activo.
+     *
+     * @param productId  Identificador del producto
+     * @param supplierId Identificador del proveedor
+     * @return MessageResponseDTO con un mensaje indicando que el proveedor fue agregado correctamente
+     * @throws RuntimeException Si el producto no existe o no está activo, o si el proveedor no se encuentra
+     */
     @Transactional
     public MessageResponseDTO addSupplier(Long productId, Long supplierId) {
         Products product = repository.findByIdAndActiveTrue(productId)
@@ -162,6 +230,14 @@ public class ProductsService {
         return new MessageResponseDTO("Proveedor agregado al producto correctamente");
     }
 
+    /**
+     * Elimina la asociación entre un producto activo y un proveedor.
+     *
+     * @param productId  Identificador del producto
+     * @param supplierId Identificador del proveedor
+     * @return MessageResponseDTO con un mensaje indicando que el proveedor fue removido correctamente
+     * @throws RuntimeException Si el producto no existe o no está activo, o si el proveedor no se encuentra
+     */
     @Transactional
     public MessageResponseDTO removeSupplier(Long productId, Long supplierId) {
         Products product = repository.findByIdAndActiveTrue(productId)
@@ -176,6 +252,13 @@ public class ProductsService {
         return new MessageResponseDTO("Proveedor removido del producto correctamente");
     }
 
+    /**
+     * Obtiene el conjunto de proveedores asociados a un producto activo.
+     *
+     * @param productId Identificador del producto
+     * @return Set de entidades Supplier asociadas al producto
+     * @throws RuntimeException Si el producto no existe o no está activo
+     */
     @Transactional(readOnly = true)
     public Set<Supplier> getSuppliersByProduct(Long productId) {
         Products product = repository.findByIdAndActiveTrue(productId)
@@ -184,6 +267,12 @@ public class ProductsService {
         return product.getSuppliers();
     }
 
+    /**
+     * Convierte una entidad Products a su correspondiente DTO de respuesta.
+     *
+     * @param product Entidad Products a convertir
+     * @return ProductsResponseDTO con los datos del producto
+     */
     private ProductsResponseDTO toDTO(Products product) {
         return ProductsResponseDTO.builder()
                 .id(product.getId())
