@@ -1,10 +1,9 @@
 package com.gestion.micromarket.dto;
 
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-import com.gestion.micromarket.entity.enums.Role;
+import com.gestion.micromarket.enums.Role;
 
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
@@ -24,22 +23,36 @@ public class EmployeesRequestDTO {
     private String name;
 
     /**
-     * Numero de docu,ento del usuario
+     * Numero de documento del empleado
      */
     @NotNull(message = "El numero de documento es obligatorio")
     @Size(min = 5, max = 10, message = "El numero de documento debe tener entre 5 y 10 caracteres")
     private String documentNumber;
 
-    
+    /**
+     * Rol del Empleado
+     */
     @NotNull(message = "El rol es obligatorio")
     private Role role;
+
+    /**
+     * Fecha en que el empleado fue contratado
+     */
     @NotNull(message = "El fecha de contratacion es obligatorio")
     @PastOrPresent(message = "La fecha de contratacion no puede ser futura")
     private LocalDate hireDate;
+
+    /**
+     * Salario del empleado
+     */
     @NotNull(message = "El salario es obligatorio")
     @DecimalMin(value = "0.0", inclusive = true, message = "El salario no puede ser menor a 0.0")
     @Positive(message = "El salario debe de ser mayor a 0")
     private BigDecimal salary;
+
+    /**
+     * Boolean para el estado del Empleado (Activo o Inactivo)
+     */
     private Boolean active; 
 
 }
