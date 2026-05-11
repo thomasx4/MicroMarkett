@@ -8,12 +8,20 @@ import lombok.Data;
 
 @Data
 public class EmployeesResponseDTO {
+
     private Long id;
+
     private String name;
+
     private String documentNumber;
+
     private String role;
+
     private LocalDate hireDate;
+
     private BigDecimal salary;
+
     private Boolean active;
+
     private LocalDateTime createdAt;
 }
