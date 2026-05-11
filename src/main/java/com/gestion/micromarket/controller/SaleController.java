@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.dto.SalesRequestDTO;
 import com.gestion.micromarket.dto.SalesResponseDTO;
 import com.gestion.micromarket.service.SaleService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +27,11 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/sales")
 public class SaleController {
 
+    /** Servicio de sales */
     private final SaleService saleService;
+
+    /** Contexto de seguridad y sesión */
+    private final SecurityContext security;
 
     /**
      * Crea una nueva venta
@@ -36,12 +40,10 @@ public class SaleController {
      * @return Respuesta con mensaje de éxito o error
      */
     @PostMapping
-    public ResponseEntity<MessageResponseDTO> createSale(@Valid @RequestBody SalesRequestDTO salesRequestDTO,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
+    public ResponseEntity<MessageResponseDTO> createSale(@Valid @RequestBody SalesRequestDTO salesRequestDTO) {
+        String role = security.getCurrentRole();
         if (!"administrator".equals(role) && !"cashier".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso. Solo administradores y cajeros"));
+            throw new RuntimeException("EL rol: '" + role + "' no esta permitido. Solo administradores y cajeros");
         }
         try {
             MessageResponseDTO response = saleService.createSale(salesRequestDTO);
@@ -58,10 +60,9 @@ public class SaleController {
      * @return Datos de la venta encontrada
      */
     @GetMapping("/{id}")
-    public ResponseEntity<SalesResponseDTO> getSaleById(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (role == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<SalesResponseDTO> getSaleById(@PathVariable Long id) {
+        if (security.getCurrentRole() == null) {
+            throw new RuntimeException("EL rol no esta permitido");
         }
         try {
             SalesResponseDTO salesResponseDTO = saleService.getSaleById(id);
@@ -77,10 +78,9 @@ public class SaleController {
      * @return Lista de todas las ventas
      */
     @GetMapping
-    public ResponseEntity<List<SalesResponseDTO>> getAllSales(HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<List<SalesResponseDTO>> getAllSales() {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             List<SalesResponseDTO> salesResponseDTOs = saleService.getAllSales();
@@ -99,11 +99,9 @@ public class SaleController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<SalesResponseDTO> updateSale(@PathVariable Long id,
-            @Valid @RequestBody SalesRequestDTO salesRequestDTO,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            @Valid @RequestBody SalesRequestDTO salesRequestDTO) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             SalesResponseDTO salesResponseDTO = saleService.updateSale(id, salesRequestDTO);
@@ -120,11 +118,9 @@ public class SaleController {
      * @return Mensaje confirmando la eliminación
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> deleteSale(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+    public ResponseEntity<MessageResponseDTO> deleteSale(@PathVariable Long id) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             MessageResponseDTO response = saleService.deleteSale(id);

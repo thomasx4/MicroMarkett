@@ -17,13 +17,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.EmployeesRequestDTO;
 import com.gestion.micromarket.dto.EmployeesResponseDTO;
 import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.enums.Role;
 import com.gestion.micromarket.service.EmployeesService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +35,9 @@ public class EmployeesController {
     /** Servicio de usuarios */
     private final EmployeesService employeesService;
 
+    /** Contexto de seguridad y sesión */
+    private final SecurityContext security;
+
     /**
      * Registra un nuevo empleado
      * 
@@ -42,43 +45,39 @@ public class EmployeesController {
      * @return MessageResponseDTO Mensaje de Confirmación (201)
      */
     @PostMapping()
-    public ResponseEntity<MessageResponseDTO> createEmplyees(
-            @Valid @RequestBody EmployeesRequestDTO employeesRequestDTO,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso para crear empleados"));
+    public ResponseEntity<MessageResponseDTO> createEmployees(
+            @Valid @RequestBody EmployeesRequestDTO employeesRequestDTO) {
+
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
 
         try {
-            MessageResponseDTO messageResponseDTO = employeesService.createrEmployees(employeesRequestDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(messageResponseDTO);
+            MessageResponseDTO response = employeesService.createrEmployees(employeesRequestDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new MessageResponseDTO(e.getMessage()));
         }
-
     }
 
     /**
      * Obtiene la lista de todos los empleados
      * 
-     * @return List<EmployeesResponseDTO> Lista con todos los empleados (201) o si
+     * @return List<EmployeesResponseDTO> Lista con todos los empleados (200) o si
      *         algo falla (400)
      */
     @GetMapping()
-    public ResponseEntity<List<EmployeesResponseDTO>> getAllEmployees(HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<List<EmployeesResponseDTO>> getAllEmployees() {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
 
         try {
             List<EmployeesResponseDTO> response = employeesService.getAllEmployees();
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -89,18 +88,19 @@ public class EmployeesController {
      * @return Optional<EmployeesResponseDTO> Empleado encontrado (201)
      */
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<EmployeesResponseDTO>> getEmployeeById(@PathVariable Long id,
-            HttpServletRequest request) {
-
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<EmployeesResponseDTO> getEmployeeById(@PathVariable Long id) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
+
         try {
             Optional<EmployeesResponseDTO> response = employeesService.getEmployeeById(id);
-            return ResponseEntity.status(HttpStatus.OK).body(response);
+            if (response.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            }
+            return ResponseEntity.status(HttpStatus.OK).body(response.get());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
 
@@ -111,19 +111,17 @@ public class EmployeesController {
      * @return EmployeesResponseDTO Empleado encontrado (201)
      */
     @GetMapping("/documentNumber/{documentNumber}")
-    public ResponseEntity<EmployeesResponseDTO> getEmployeeByDocumentNumber(@PathVariable String documentNumber,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<EmployeesResponseDTO> getEmployeeByDocumentNumber(@PathVariable String documentNumber) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
+
         try {
             EmployeesResponseDTO response = employeesService.getEmployeeByDocumentNumber(documentNumber);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
     }
 
     /**
@@ -135,11 +133,9 @@ public class EmployeesController {
      * @throws RuntimeException si el valor de (rol) no es válido
      */
     @GetMapping("/role/{role}")
-    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByRole(@PathVariable String role,
-            HttpServletRequest request) {
-        String userRole = (String) request.getAttribute("role");
-        if (!"administrator".equals(userRole)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByRole(@PathVariable String role) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
 
         if (!role.equalsIgnoreCase("administrator") && !role.equalsIgnoreCase("cashier")
@@ -148,7 +144,7 @@ public class EmployeesController {
         }
 
         try {
-            Role rolEnum = Role.valueOf(role);
+            Role rolEnum = Role.valueOf(role.toLowerCase());
             List<EmployeesResponseDTO> response = employeesService.getEmployeesByRole(rolEnum);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
@@ -164,12 +160,10 @@ public class EmployeesController {
      *         específico (201)
      * @throws RuntimeException si el valor de (active) no es ni true ni false
      */
-    @GetMapping("active/{active}")
-    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByActive(@PathVariable String active,
-            HttpServletRequest request) {
-        String userRole = (String) request.getAttribute("role");
-        if (!"administrator".equals(userRole)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    @GetMapping("/active/{active}")
+    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByActive(@PathVariable String active) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
 
         if (!active.equalsIgnoreCase("true") && !active.equalsIgnoreCase("false")) {
@@ -196,12 +190,10 @@ public class EmployeesController {
     @GetMapping("/hire-date-range")
     public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByHireDateRange(
             @RequestParam LocalDate startDate,
-            @RequestParam LocalDate endDate,
-            HttpServletRequest request) {
+            @RequestParam LocalDate endDate) {
 
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
 
         try {
@@ -220,21 +212,20 @@ public class EmployeesController {
      * @return EmployeesResponseDTO empleado con datos actualizados (200)
      */
     @PutMapping("/{id}")
-    public ResponseEntity<EmployeesResponseDTO> updateEmployee(@PathVariable Long id,
-            @RequestBody EmployeesRequestDTO employeesRequestDTO,
-            HttpServletRequest request) {
+    public ResponseEntity<EmployeesResponseDTO> updateEmployee(
+            @PathVariable Long id,
+            @RequestBody EmployeesRequestDTO employeesRequestDTO) {
 
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
+
         try {
             EmployeesResponseDTO response = employeesService.updateEmployeeComplete(id, employeesRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
     }
 
     /**
@@ -246,14 +237,14 @@ public class EmployeesController {
      * @return EmployeesResponseDTO empleado con dato o datos actualizados
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<EmployeesResponseDTO> updateSpecificEmployee(@PathVariable Long id,
-            @RequestBody EmployeesRequestDTO employeesRequestDTO,
-            HttpServletRequest request) {
+    public ResponseEntity<EmployeesResponseDTO> updateSpecificEmployee(
+            @PathVariable Long id,
+            @RequestBody EmployeesRequestDTO employeesRequestDTO) {
 
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
+
         try {
             EmployeesResponseDTO response = employeesService.updateEmployee(id, employeesRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -269,12 +260,11 @@ public class EmployeesController {
      * @return MessageResponseDTO mensaje de confirmación de eliminacion (200)
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> deleteEmployeeByid(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso para eliminar empleados"));
+    public ResponseEntity<MessageResponseDTO> deleteEmployeeByid(@PathVariable Long id) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
+
         try {
             MessageResponseDTO messageResponseDTO = employeesService.deleteEmployeeByid(id);
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
@@ -290,13 +280,11 @@ public class EmployeesController {
      * @return MessageResponseDTO Mensaje de confirmación de eliminacion (200)
      */
     @DeleteMapping("/documentNumber/{documentNumber}")
-    public ResponseEntity<MessageResponseDTO> deleteEmployeeByDocumentNumber(@PathVariable String documentNumber,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso para eliminar empleados"));
+    public ResponseEntity<MessageResponseDTO> deleteEmployeeByDocumentNumber(@PathVariable String documentNumber) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
+
         try {
             MessageResponseDTO messageResponseDTO = employeesService.deleteEmployeeByNumberDocument(documentNumber);
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);

@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.*;
 import com.gestion.micromarket.entity.Supplier;
 import com.gestion.micromarket.service.ProductsService;
@@ -20,7 +21,11 @@ import com.gestion.micromarket.service.ProductsService;
 @RequiredArgsConstructor
 public class ProductsController {
 
+    /** Servicio de prodcutos */
     private final ProductsService service;
+
+    /** Contexto de seguridad y sesión */
+    private final SecurityContext security;
 
     /**
      * Crea un nuevo producto.
@@ -50,10 +55,9 @@ public class ProductsController {
      * @return ResponseEntity con la lista de ProductsResponseDTO
      */
     @GetMapping
-    public ResponseEntity<List<ProductsResponseDTO>> findAll(HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (role == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<List<ProductsResponseDTO>> findAll() {
+        if (security.getCurrentRole() == null) {
+            throw new RuntimeException("EL rol no esta permitido");
         }
         try {
             return ResponseEntity.ok(service.findAll());
@@ -69,10 +73,9 @@ public class ProductsController {
      * @return ResponseEntity con ProductsResponseDTO del producto encontrado
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ProductsResponseDTO> findById(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (role == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<ProductsResponseDTO> findById(@PathVariable Long id) {
+        if (security.getCurrentRole() == null) {
+            throw new RuntimeException("EL rol no esta permitido");
         }
         try {
             return ResponseEntity.ok(service.findById(id));
@@ -89,10 +92,9 @@ public class ProductsController {
      *         que coinciden
      */
     @GetMapping("/name/{name}")
-    public ResponseEntity<List<ProductsResponseDTO>> findByName(@PathVariable String name, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (role == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<List<ProductsResponseDTO>> findByName(@PathVariable String name) {
+        if (security.getCurrentRole() == null) {
+            throw new RuntimeException("EL rol no esta permitido");
         }
         try {
             return ResponseEntity.ok(service.findByName(name));
@@ -108,10 +110,9 @@ public class ProductsController {
      * @return ResponseEntity con ProductsResponseDTO del producto encontrado
      */
     @GetMapping("/barcode/{barcode}")
-    public ResponseEntity<ProductsResponseDTO> findByBarcode(@PathVariable String barcode, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (role == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<ProductsResponseDTO> findByBarcode(@PathVariable String barcode) {
+        if (security.getCurrentRole() == null) {
+            throw new RuntimeException("EL rol no esta permitido");
         }
         try {
             return ResponseEntity.ok(service.findByBarcode(barcode));
@@ -128,11 +129,9 @@ public class ProductsController {
      *         de la categoría
      */
     @GetMapping("/category/{categoryId}")
-    public ResponseEntity<List<ProductsResponseDTO>> findByCategory(@PathVariable Long categoryId,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (role == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<List<ProductsResponseDTO>> findByCategory(@PathVariable Long categoryId) {
+        if (security.getCurrentRole() == null) {
+            throw new RuntimeException("EL rol no esta permitido");
         }
         try {
             return ResponseEntity.ok(service.findByCategory(categoryId));
@@ -151,12 +150,9 @@ public class ProductsController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> update(@PathVariable Long id,
-            @Valid @RequestBody ProductsRequestDTO dto,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+            @Valid @RequestBody ProductsRequestDTO dto) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             return ResponseEntity.ok(service.update(id, dto));
@@ -173,11 +169,9 @@ public class ProductsController {
      *         operación
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> softDelete(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+    public ResponseEntity<MessageResponseDTO> softDelete(@PathVariable Long id) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             return ResponseEntity.ok(service.softDelete(id));
@@ -194,11 +188,9 @@ public class ProductsController {
      *         operación
      */
     @PatchMapping("/{id}/restore")
-    public ResponseEntity<MessageResponseDTO> restore(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+    public ResponseEntity<MessageResponseDTO> restore(@PathVariable Long id) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
 
         try {
@@ -208,16 +200,18 @@ public class ProductsController {
         }
     }
 
-    // Endpoints para gestionar proveedores (ManyToMany)
-
+    /**
+     * Asocia un proveedor específico a un producto
+     * 
+     * @param productId  ID del producto
+     * @param supplierId ID del proveedor a añadir
+     * @return Mensaje de éxito o error en la asociación
+     */
     @PostMapping("/{productId}/suppliers/{supplierId}")
     public ResponseEntity<MessageResponseDTO> addSupplier(@PathVariable Long productId,
-            @PathVariable Long supplierId,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+            @PathVariable Long supplierId) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             return ResponseEntity.ok(service.addSupplier(productId, supplierId));
@@ -226,14 +220,18 @@ public class ProductsController {
         }
     }
 
+    /**
+     * Remueve la asociación de un proveedor con un producto
+     * 
+     * @param productId  ID del producto
+     * @param supplierId ID del proveedor a remover
+     * @return Mensaje de éxito o error en la desvinculación
+     */
     @DeleteMapping("/{productId}/suppliers/{supplierId}")
     public ResponseEntity<MessageResponseDTO> removeSupplier(@PathVariable Long productId,
-            @PathVariable Long supplierId,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+            @PathVariable Long supplierId) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             return ResponseEntity.ok(service.removeSupplier(productId, supplierId));
@@ -242,12 +240,16 @@ public class ProductsController {
         }
     }
 
+    /**
+     * Obtiene la lista de proveedores asociados a un producto
+     * 
+     * @param productId ID del producto a consultar
+     * @return Conjunto de proveedores vinculados al producto
+     */
     @GetMapping("/{productId}/suppliers")
-    public ResponseEntity<Set<Supplier>> getSuppliersByProduct(@PathVariable Long productId,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (role == null) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<Set<Supplier>> getSuppliersByProduct(@PathVariable Long productId) {
+        if (security.getCurrentRole() == null) {
+            throw new RuntimeException("EL rol no esta permitido");
         }
         try {
             return ResponseEntity.ok(service.getSuppliersByProduct(productId));
