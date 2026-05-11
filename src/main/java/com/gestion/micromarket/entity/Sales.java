@@ -23,32 +23,55 @@ import lombok.Data;
 @Data
 @Table(name = "sales")
 public class Sales {
+    /**
+     * Identificador único de la venta
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * Empleado que realizó la venta
+     */
     @ManyToOne(fetch = FetchType.LAZY)  
     @JoinColumn(name = "employee_id", nullable = false)
     private Employees employee;
 
+    /**
+     * Fecha y hora en que se realizó la venta
+     */
     @Column(name = "sale_date", nullable = false, updatable = false)
     private LocalDateTime saleDate;
 
+    /**
+     * Subtotal de la venta (sin IVA)
+     */
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal subtotal;
 
+    /**
+     * Valor del IVA calculado para la venta
+     */
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal vat;
 
+    /**
+     * Total de la venta (subtotal + IVA)
+     */
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
+    /**
+     * Lista de productos detallados de esta venta
+     */
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<SaleDetail> saleDetails = new ArrayList<>();
 
+    /**
+     * Se ejecuta antes de guardar la venta para asignar la fecha actual
+     */
     @PrePersist
     protected void onCreate() {
         saleDate = LocalDateTime.now();
     }
-
 }

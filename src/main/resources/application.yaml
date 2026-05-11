@@ -2,9 +2,9 @@ spring:
   application:
     name: micromarket
   datasource:
-    url: jdbc:mysql://junction.proxy.rlwy.net:53113/railway
+    url: jdbc:mysql://viaduct.proxy.rlwy.net:40646/railway
     username: root
-    password: IVYzgzySSkTLjmggoZhHfUCjeDaZJsZI
+    password: GSDORbzkCusUqFueYCoWiBgOTLxBvDUk
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -32,3 +32,8 @@ server:
   servlet: 
     context-path: /micromarket
 
+security:
+  jwt:
+    # Genera llave secreta con openssl rand -base64 32
+    secret-key: efmycl3ZY1LasnSGalvccYA1nR5Yo3r9WdWYoHft8rY=
+    token-expiration: 600000 # 10 min expresado en ms

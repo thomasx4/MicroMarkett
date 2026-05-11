@@ -9,11 +9,20 @@ import lombok.Data;
 
 @Data
 public class SalesRequestDTO {
+    /**
+     * ID del empleado que realiza la venta
+     */
     @NotNull(message = "El ID del empleado es obligatorio")
     private Long employeeId;
 
+    /**
+     * Lista de productos incluidos en la venta
+     */
     @NotNull(message = "Los detalles de venta son obligatorios")
+
     @NotEmpty(message = "La venta debe tener al menos un producto")
+    
     @Size(min = 1, message = "La venta debe tener al menos un producto")
+    
     private List<SaleDetailRequestDTO> saleDetails;
 }

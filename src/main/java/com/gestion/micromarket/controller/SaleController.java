@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.dto.SalesRequestDTO;
 import com.gestion.micromarket.dto.SalesResponseDTO;
@@ -26,37 +27,107 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/sales")
 public class SaleController {
 
+    /** Servicio de sales */
     private final SaleService saleService;
 
+    /** Contexto de seguridad y sesión */
+    private final SecurityContext security;
+
+    /**
+     * Crea una nueva venta
+     *
+     * @param salesRequestDTO Datos de la venta
+     * @return Respuesta con mensaje de éxito o error
+     */
     @PostMapping
     public ResponseEntity<MessageResponseDTO> createSale(@Valid @RequestBody SalesRequestDTO salesRequestDTO) {
-        MessageResponseDTO response = saleService.createSale(salesRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        String role = security.getCurrentRole();
+        if (!"administrator".equals(role) && !"cashier".equals(role)) {
+            throw new RuntimeException("EL rol: '" + role + "' no esta permitido. Solo administradores y cajeros");
+        }
+        try {
+            MessageResponseDTO response = saleService.createSale(salesRequestDTO);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO(e.getMessage()));
+        }
     }
 
+    /**
+     * Busca una venta por su ID
+     *
+     * @param id ID de la venta
+     * @return Datos de la venta encontrada
+     */
     @GetMapping("/{id}")
     public ResponseEntity<SalesResponseDTO> getSaleById(@PathVariable Long id) {
-        SalesResponseDTO salesResponseDTO = saleService.getSaleById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(salesResponseDTO);
+        if (security.getCurrentRole() == null) {
+            throw new RuntimeException("EL rol no esta permitido");
+        }
+        try {
+            SalesResponseDTO salesResponseDTO = saleService.getSaleById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(salesResponseDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
+    /**
+     * Obtiene todas las ventas registradas
+     *
+     * @return Lista de todas las ventas
+     */
     @GetMapping
     public ResponseEntity<List<SalesResponseDTO>> getAllSales() {
-        List<SalesResponseDTO> salesResponseDTOs = saleService.getAllSales();
-        return ResponseEntity.ok(salesResponseDTOs);
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
+        }
+        try {
+            List<SalesResponseDTO> salesResponseDTOs = saleService.getAllSales();
+            return ResponseEntity.ok(salesResponseDTOs);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
+    /**
+     * Actualiza los datos de una venta existente
+     *
+     * @param id              ID de la venta a actualizar
+     * @param salesRequestDTO Nuevos datos de la venta
+     * @return Datos actualizados de la venta
+     */
     @PutMapping("/{id}")
     public ResponseEntity<SalesResponseDTO> updateSale(@PathVariable Long id,
             @Valid @RequestBody SalesRequestDTO salesRequestDTO) {
-        SalesResponseDTO salesResponseDTO = saleService.updateSale(id, salesRequestDTO);
-        return ResponseEntity.status(HttpStatus.OK).body(salesResponseDTO);
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
+        }
+        try {
+            SalesResponseDTO salesResponseDTO = saleService.updateSale(id, salesRequestDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(salesResponseDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
     }
 
+    /**
+     * Elimina una venta por su ID
+     *
+     * @param id ID de la venta a eliminar
+     * @return Mensaje confirmando la eliminación
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> deleteSale(@PathVariable Long id) {
-        MessageResponseDTO response = saleService.deleteSale(id);
-        return ResponseEntity.ok(response);
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
+        }
+        try {
+            MessageResponseDTO response = saleService.deleteSale(id);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO(e.getMessage()));
+        }
     }
 
 }

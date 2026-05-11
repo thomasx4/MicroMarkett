@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 @Entity
 @Table(name = "categories")
 @Data
