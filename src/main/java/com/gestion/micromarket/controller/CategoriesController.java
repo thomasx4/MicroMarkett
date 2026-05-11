@@ -1,11 +1,11 @@
 package com.gestion.micromarket.controller;
 
+import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.CategoriesRequestDTO;
 import com.gestion.micromarket.dto.CategoriesResponseDTO;
 import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.service.CategoriesService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -19,10 +19,12 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/categories")
 public class CategoriesController {
-    /**
-     * Servicio de categoria
-     */
+
+    /** Servicio de categoria */
     private final CategoriesService categoriesService;
+
+    /** Contexto de seguridad y sesión */
+    private final SecurityContext security;
 
     /**
      * Obtiene todas las categorias
@@ -30,10 +32,9 @@ public class CategoriesController {
      * @return Lista de categorias
      */
     @GetMapping
-    public ResponseEntity<List<CategoriesResponseDTO>> getAll(HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<List<CategoriesResponseDTO>> getAll() {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
 
         try {
@@ -52,10 +53,10 @@ public class CategoriesController {
      * @return Categoria encontrada o si no existe error 404
      */
     @GetMapping("/{id}")
-    public ResponseEntity<CategoriesResponseDTO> getById(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
+    public ResponseEntity<CategoriesResponseDTO> getById(@PathVariable Long id) {
+        String role = security.getCurrentRole();
         if (!"administrator".equals(role) && !"assistant".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+            throw new RuntimeException("EL rol: '" + role + "' no esta permitido");
         }
 
         try {
@@ -77,12 +78,9 @@ public class CategoriesController {
      * @return Categoria creada o mensaje de error
      */
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+    public ResponseEntity<?> create(@Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
 
         try {
@@ -107,11 +105,9 @@ public class CategoriesController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> update(@PathVariable Long id,
-            @Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+            @Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
 
         try {
@@ -134,11 +130,9 @@ public class CategoriesController {
      * @return Mensaje de exito error
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+    public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
 
         try {

@@ -1,9 +1,9 @@
 package com.gestion.micromarket.controller;
 
+import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.*;
 import com.gestion.micromarket.service.SupplierService;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +22,9 @@ public class SupplierController {
      */
     private final SupplierService supplierService;
 
+    /** Contexto de seguridad y sesión */
+    private final SecurityContext security;
+
     /**
      * Crea un nuevo proveedor
      * 
@@ -29,12 +32,9 @@ public class SupplierController {
      * @return Mensaje de éxito o error
      */
     @PostMapping
-    public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody SupplierRequestDTO supplierRequestDTO,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+    public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody SupplierRequestDTO supplierRequestDTO) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             MessageResponseDTO response = supplierService.create(supplierRequestDTO);
@@ -52,10 +52,9 @@ public class SupplierController {
      * @return Lista de proveedores
      */
     @GetMapping
-    public ResponseEntity<List<SupplierResponseDTO>> getAll(HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role) && !"assistant".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<List<SupplierResponseDTO>> getAll() {
+        if (!"administrator".equals(security.getCurrentRole()) && !"assistant".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             List<SupplierResponseDTO> response = supplierService.getAll();
@@ -73,10 +72,9 @@ public class SupplierController {
      * @return Proveedor encontrado o error 404 si no existe
      */
     @GetMapping("/{id}")
-    public ResponseEntity<SupplierResponseDTO> getById(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role) && !"assistant".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+    public ResponseEntity<SupplierResponseDTO> getById(@PathVariable Long id) {
+        if (!"administrator".equals(security.getCurrentRole()) && !"assistant".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             SupplierResponseDTO response = supplierService.getById(id);
@@ -99,12 +97,9 @@ public class SupplierController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> update(@PathVariable Long id,
-            @Valid @RequestBody SupplierRequestDTO supplierRequestDTO,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+            @Valid @RequestBody SupplierRequestDTO supplierRequestDTO) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
 
         try {
@@ -127,11 +122,9 @@ public class SupplierController {
      * @return Mensaje de éxito o error
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id, HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+    public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             MessageResponseDTO response = supplierService.delete(id);
@@ -154,12 +147,9 @@ public class SupplierController {
      * @return Mensaje detallado de la operación o error
      */
     @PostMapping("/warehouse-entry")
-    public ResponseEntity<MessageResponseDTO> warehouseEntry(@Valid @RequestBody WarehouseEntryDTO warehouseEntryDTO,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
+    public ResponseEntity<MessageResponseDTO> warehouseEntry(@Valid @RequestBody WarehouseEntryDTO warehouseEntryDTO) {
+        if (!"administrator".equals(security.getCurrentRole())) {
+            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
         try {
             MessageResponseDTO response = supplierService.warehouseEntry(warehouseEntryDTO);
