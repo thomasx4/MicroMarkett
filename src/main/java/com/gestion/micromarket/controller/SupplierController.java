@@ -3,6 +3,7 @@ package com.gestion.micromarket.controller;
 import com.gestion.micromarket.dto.*;
 import com.gestion.micromarket.service.SupplierService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public class SupplierController {
 
     /**
-     * Servicio de proveedores 
+     * Servicio de proveedores
      */
     private final SupplierService supplierService;
 
@@ -28,7 +29,13 @@ public class SupplierController {
      * @return Mensaje de éxito o error
      */
     @PostMapping
-    public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody SupplierRequestDTO supplierRequestDTO) {
+    public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody SupplierRequestDTO supplierRequestDTO,
+            HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso"));
+        }
         try {
             MessageResponseDTO response = supplierService.create(supplierRequestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -45,7 +52,11 @@ public class SupplierController {
      * @return Lista de proveedores
      */
     @GetMapping
-    public ResponseEntity<List<SupplierResponseDTO>> getAll() {
+    public ResponseEntity<List<SupplierResponseDTO>> getAll(HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role) && !"assistant".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         try {
             List<SupplierResponseDTO> response = supplierService.getAll();
             return ResponseEntity.ok(response);
@@ -62,7 +73,11 @@ public class SupplierController {
      * @return Proveedor encontrado o error 404 si no existe
      */
     @GetMapping("/{id}")
-    public ResponseEntity<SupplierResponseDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<SupplierResponseDTO> getById(@PathVariable Long id, HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role) && !"assistant".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
+        }
         try {
             SupplierResponseDTO response = supplierService.getById(id);
             if (response == null) {
@@ -84,7 +99,14 @@ public class SupplierController {
      */
     @PutMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> update(@PathVariable Long id,
-            @Valid @RequestBody SupplierRequestDTO supplierRequestDTO) {
+            @Valid @RequestBody SupplierRequestDTO supplierRequestDTO,
+            HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso"));
+        }
+
         try {
             MessageResponseDTO response = supplierService.update(id, supplierRequestDTO);
             if (response.getMessage().equals("El NIT ya está en uso por otro proveedor")) {
@@ -105,7 +127,12 @@ public class SupplierController {
      * @return Mensaje de éxito o error
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id) {
+    public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id, HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso"));
+        }
         try {
             MessageResponseDTO response = supplierService.delete(id);
             if (response.getMessage().equals("Proveedor no encontrado")) {
@@ -121,13 +148,19 @@ public class SupplierController {
 
     /**
      * Registra una entrada de productos al almacén
-
+     * 
      * 
      * @param warehouseEntryDTO
      * @return Mensaje detallado de la operación o error
      */
     @PostMapping("/warehouse-entry")
-    public ResponseEntity<MessageResponseDTO> warehouseEntry(@Valid @RequestBody WarehouseEntryDTO warehouseEntryDTO) {
+    public ResponseEntity<MessageResponseDTO> warehouseEntry(@Valid @RequestBody WarehouseEntryDTO warehouseEntryDTO,
+            HttpServletRequest request) {
+        String role = (String) request.getAttribute("role");
+        if (!"administrator".equals(role)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(new MessageResponseDTO("No tienes permiso"));
+        }
         try {
             MessageResponseDTO response = supplierService.warehouseEntry(warehouseEntryDTO);
             return ResponseEntity.status(HttpStatus.OK).body(response);
