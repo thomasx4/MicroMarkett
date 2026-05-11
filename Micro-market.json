@@ -1,6 +1,6 @@
 [
   {
-    "v": 11,
+    "v": 12,
     "id": "cmnnse6ol03krj71m9tjckdfr",
     "name": "System-Suppliers",
     "folders": [],
@@ -8,7 +8,8 @@
       {
         "v": "17",
         "auth": {
-          "authType": "inherit",
+          "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBsb3llZUlkIjoxMDEsInJvbGUiOiJjYXNoaWVyIiwic3ViIjoiNzg5MDEyIiwiaWF0IjoxNzc4NTMxMjA3LCJleHAiOjE3Nzg1MzE4MDd9.gDlsggRWvE9An20qwBkN2jguznRDnB7atNuI4iGYRwE",
+          "authType": "bearer",
           "authActive": true
         },
         "body": {
@@ -52,7 +53,11 @@
       {
         "v": "17",
         "auth": {
-          "authType": "inherit",
+          "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBsb3llZUlkIjoxMDIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic3ViIjoiMTIzNDU2NyIsImlhdCI6MTc3ODUzMjY4NiwiZXhwIjoxNzc4NTMzMjg2fQ.27ty2-OPt1eaDZruj6Hv5OTJqjJOLLIjEcoTVyCFjy4",
+          "authType": "bearer",
+          "password": "",
+          "username": "",
+          "algorithm": "MD5",
           "authActive": true
         },
         "body": {
@@ -66,6 +71,7 @@
         "endpoint": "http://localhost:9090/micromarket/suppliers",
         "responses": {},
         "testScript": "",
+        "description": null,
         "preRequestScript": "",
         "requestVariables": [],
         "id": "cmnpdmtz703zgfy1mw4fim6ah"
@@ -140,10 +146,12 @@
     },
     "headers": [],
     "variables": [],
-    "description": null
+    "description": null,
+    "preRequestScript": "",
+    "testScript": ""
   },
   {
-    "v": 11,
+    "v": 12,
     "id": "cmndkgvg53tp8gy1m3y3gdjyp",
     "name": "System-Employees",
     "folders": [],
@@ -173,7 +181,8 @@
       {
         "v": "17",
         "auth": {
-          "authType": "inherit",
+          "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBsb3llZUlkIjoxMDIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic3ViIjoiMTIzNDU2NyIsImlhdCI6MTc3ODUyNTQ5NCwiZXhwIjoxNzc4NTI2MDk0fQ.yNvigMzQbl9yUkGqrhr2AJ1n854_oFfYTZDlpJgys08",
+          "authType": "bearer",
           "authActive": true
         },
         "body": {
@@ -195,7 +204,8 @@
       {
         "v": "17",
         "auth": {
-          "authType": "inherit",
+          "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBsb3llZUlkIjoxMDEsInJvbGUiOiJjYXNoaWVyIiwic3ViIjoiNzg5MDEyIiwiaWF0IjoxNzc4NTExNjIwLCJleHAiOjE3Nzg1MTIyMjB9.lD2HI4m36TkzfN0ascFdFkQd9Cm6RlRCbi7aDoId2nU",
+          "authType": "bearer",
           "authActive": true
         },
         "body": {
@@ -206,7 +216,7 @@
         "method": "GET",
         "params": [],
         "headers": [],
-        "endpoint": "http://localhost:9090/micromarket/employees/1",
+        "endpoint": "http://localhost:9090/micromarket/employees/101",
         "responses": {},
         "testScript": "",
         "description": null,
@@ -283,7 +293,8 @@
       {
         "v": "17",
         "auth": {
-          "authType": "inherit",
+          "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBsb3llZUlkIjoxMDEsInJvbGUiOiJjYXNoaWVyIiwic3ViIjoiNzg5MDEyIiwiaWF0IjoxNzc4NTI3MzE5LCJleHAiOjE3Nzg1Mjc5MTl9.yaK-vV0NSr73FRuOi6dh5-9JR-2DoLaSlNltl_T2cQs",
+          "authType": "bearer",
           "authActive": true
         },
         "body": {
@@ -305,18 +316,19 @@
       {
         "v": "17",
         "auth": {
-          "authType": "inherit",
+          "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBsb3llZUlkIjoxMDEsInJvbGUiOiJjYXNoaWVyIiwic3ViIjoiNzg5MDEyIiwiaWF0IjoxNzc4NTI3MzE5LCJleHAiOjE3Nzg1Mjc5MTl9.yaK-vV0NSr73FRuOi6dh5-9JR-2DoLaSlNltl_T2cQs",
+          "authType": "bearer",
           "authActive": true
         },
         "body": {
-          "body": "{\n  \"name\": \"Juan Carlos Pérez\",\n  \"documentNumber\": \"12345678\",\n  \"role\": \"Cashier\",\n  \"hireDate\": \"2024-02-01\",\n  \"salary\": 5800000\n}",
+          "body": "{\n  \"name\": \"Juan Carlos Pérez\",\n  \"documentNumber\": \"12345678\",\n  \"role\": \"cashier\",\n  \"hireDate\": \"2024-02-01\",\n  \"salary\": 5800000\n}",
           "contentType": "application/json"
         },
         "name": "PUT - ACTUALIZAR POR ID ",
         "method": "PUT",
         "params": [],
         "headers": [],
-        "endpoint": "http://localhost:9090/micromarket/employees/1",
+        "endpoint": "http://localhost:9090/micromarket/employees/101",
         "responses": {},
         "testScript": "",
         "description": null,
@@ -395,10 +407,12 @@
     },
     "headers": [],
     "variables": [],
-    "description": null
+    "description": null,
+    "preRequestScript": "",
+    "testScript": ""
   },
   {
-    "v": 11,
+    "v": 12,
     "id": "cmndkigvd3tpbgy1my2xaungn",
     "name": "system-categories",
     "folders": [],
@@ -406,7 +420,8 @@
       {
         "v": "17",
         "auth": {
-          "authType": "inherit",
+          "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBsb3llZUlkIjoxMDIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic3ViIjoiMTIzNDU2NyIsImlhdCI6MTc3ODQzNDk1MiwiZXhwIjoxNzc4NDM1NTUyfQ.W547V8FnqwabtrBoZIcjblJNzJQiT-Ln-yv6nidcSyU",
+          "authType": "bearer",
           "authActive": true
         },
         "body": {
@@ -420,6 +435,7 @@
         "endpoint": "http://localhost:9090/micromarket/categories",
         "responses": {},
         "testScript": "",
+        "description": null,
         "preRequestScript": "",
         "requestVariables": [],
         "id": "cmnpznye105v5fz1l1n5sj9v1"
@@ -427,7 +443,8 @@
       {
         "v": "17",
         "auth": {
-          "authType": "inherit",
+          "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBsb3llZUlkIjoxMDIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic3ViIjoiMTIzNDU2NyIsImlhdCI6MTc3ODUyODMxMiwiZXhwIjoxNzc4NTI4OTEyfQ.jAIyCuKQ6WiaUO-rvkWxbeDHS9ca7F7wfmD3VvoIRaU",
+          "authType": "bearer",
           "authActive": true
         },
         "body": {
@@ -441,6 +458,7 @@
         "endpoint": "http://localhost:9090/micromarket/categories",
         "responses": {},
         "testScript": "",
+        "description": null,
         "preRequestScript": "",
         "requestVariables": [],
         "id": "cmnpzor6105v7fz1le0pns8ci"
@@ -515,10 +533,12 @@
     },
     "headers": [],
     "variables": [],
-    "description": null
+    "description": null,
+    "preRequestScript": "",
+    "testScript": ""
   },
   {
-    "v": 11,
+    "v": 12,
     "id": "cmndm7s6244yuf21m16y940od",
     "name": "System-Products",
     "folders": [],
@@ -526,11 +546,12 @@
       {
         "v": "17",
         "auth": {
-          "authType": "inherit",
+          "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBsb3llZUlkIjoxMDIsInJvbGUiOiJhZG1pbmlzdHJhdG9yIiwic3ViIjoiMTIzNDU2NyIsImlhdCI6MTc3ODUyOTIxMSwiZXhwIjoxNzc4NTI5ODExfQ.0u7lCLnvuzaWmJyaI6TV8-_SGo3rb0KYNFOpTl1eUQI",
+          "authType": "bearer",
           "authActive": true
         },
         "body": {
-          "body": "{\n    \"name\": \"Aceite Girasol\",\n    \"barcode\": \"00000000\",\n    \"price\": 10.99,\n    \"stock\": 20,\n    \"active\": true,\n    \"categoryId\": 2\n}",
+          "body": "{\n    \"name\": \"Aceite\",\n    \"barcode\": \"00000001\",\n    \"price\": 10.99,\n    \"stock\": 20,\n  \t\"active\": \"true\",\n    \"categoryId\": 4\n}",
           "contentType": "application/json"
         },
         "name": "POST - CREAR PRODUCTO",
@@ -570,7 +591,8 @@
       {
         "v": "17",
         "auth": {
-          "authType": "inherit",
+          "token": "eyJhbGciOiJIUzI1NiJ9.eyJlbXBsb3llZUlkIjoxMDEsInJvbGUiOiJjYXNoaWVyIiwic3ViIjoiNzg5MDEyIiwiaWF0IjoxNzc4NTI4OTQ4LCJleHAiOjE3Nzg1Mjk1NDh9.4bzDj6u7EfikTevYA8aWiqZM3Fgumd6evXjelkh6BqM",
+          "authType": "bearer",
           "authActive": true
         },
         "body": {
@@ -750,10 +772,12 @@
     },
     "headers": [],
     "variables": [],
-    "description": null
+    "description": null,
+    "preRequestScript": "",
+    "testScript": ""
   },
   {
-    "v": 11,
+    "v": 12,
     "id": "cmnnrfld403jbj71mimm3lvlk",
     "name": "System-sales",
     "folders": [],
@@ -875,6 +899,70 @@
     },
     "headers": [],
     "variables": [],
-    "description": null
+    "description": null,
+    "preRequestScript": "",
+    "testScript": ""
+  },
+  {
+    "v": 12,
+    "id": "cmox17lfa459lir1lmul797a4",
+    "name": "System-auth",
+    "folders": [],
+    "requests": [
+      {
+        "v": "17",
+        "auth": {
+          "token": "",
+          "authType": "bearer",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n    \"documentNumber\": \"ADMIN002\",\n    \"name\": \"Maria Administradora\",\n    \"password\": \"admin123\",\n    \"role\": \"administrator\",\n    \"hireDate\": \"2024-01-01\",\n    \"salary\": 3500000\n}",
+          "contentType": "application/json"
+        },
+        "name": "POST - REGISTRAR USUARIO",
+        "method": "POST",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/auth/register",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmox1879p3yavh01lpbeis6yw"
+      },
+      {
+        "v": "17",
+        "auth": {
+          "authType": "inherit",
+          "authActive": true
+        },
+        "body": {
+          "body": "{\n    \"documentNumber\": \"1234567\",\n    \"password\": \"123456\"\n}\n\n// {\n//     \"documentNumber\": \"789012\",\n//     \"password\": \"123456\"\n// } ",
+          "contentType": "application/json"
+        },
+        "name": "POST - INICIAR SESION",
+        "method": "POST",
+        "params": [],
+        "headers": [],
+        "endpoint": "http://localhost:9090/micromarket/auth/login",
+        "responses": {},
+        "testScript": "",
+        "description": null,
+        "preRequestScript": "",
+        "requestVariables": [],
+        "id": "cmox1alhk3yaxh01lglhfwe41"
+      }
+    ],
+    "auth": {
+      "authType": "inherit",
+      "authActive": true
+    },
+    "headers": [],
+    "variables": [],
+    "description": null,
+    "preRequestScript": "",
+    "testScript": ""
   }
 ]
