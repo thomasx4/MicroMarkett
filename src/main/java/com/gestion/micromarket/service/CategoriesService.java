@@ -28,14 +28,22 @@ public class CategoriesService {
     private final SecurityContext security;
 
     /**
+     * Método privado para reutilizar la lógica de validación de administrador.
+     */
+    private void validateAdminRole() {
+        if (!Role.administrator.name().equals(security.getCurrentRole())) {
+            throw new SecurityAuthorizationException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
+        }
+    }
+
+    /**
      * Obtiene todas las categorias
      * 
      * @return Lista de categorias convertidas a DTO de respuesta
      */
     public List<CategoriesResponseDTO> getAll() {
-        if (!Role.administrator.name().equals(security.getCurrentRole())) {
-            throw new SecurityAuthorizationException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
+        validateAdminRole();
+
         List<Categories> list = categoriesRepository.findAll();
         List<CategoriesResponseDTO> response = new ArrayList<>();
 
@@ -85,9 +93,8 @@ public class CategoriesService {
      */
     public CategoriesResponseDTO create(CategoriesRequestDTO categoriesRequestDTO) {
 
-        if (!Role.administrator.name().equals(security.getCurrentRole())) {
-            throw new SecurityAuthorizationException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
+        validateAdminRole();
+
         if (categoriesRepository.findByName(categoriesRequestDTO.getName()).isPresent()) {
             throw new RuntimeException("La categoria ya existe");
         }
@@ -116,9 +123,8 @@ public class CategoriesService {
      */
     public MessageResponseDTO update(Long id, CategoriesRequestDTO categoriesRequestDTO) {
 
-        if (!Role.administrator.name().equals(security.getCurrentRole())) {
-            throw new SecurityAuthorizationException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
+        validateAdminRole();
+
         Categories categories = categoriesRepository.findById(id).orElse(null);
 
         if (categories == null) {
@@ -137,9 +143,8 @@ public class CategoriesService {
      * @return Mensaje indicando el resultado de la operacion
      */
     public MessageResponseDTO delete(Long id) {
-        if (!Role.administrator.name().equals(security.getCurrentRole())) {
-            throw new SecurityAuthorizationException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
+        validateAdminRole();
+        
         Categories categories = categoriesRepository.findById(id).orElse(null);
         if (categories == null) {
             return new MessageResponseDTO("Categoria no encontrada");
