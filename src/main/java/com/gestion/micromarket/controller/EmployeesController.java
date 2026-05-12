@@ -96,11 +96,11 @@ public class EmployeesController {
         try {
             Optional<EmployeesResponseDTO> response = employeesService.getEmployeeById(id);
             if (response.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); //debo de eliminar esta condicion
             }
             return ResponseEntity.status(HttpStatus.OK).body(response.get());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); //debo agregar 'error' 
         }
     }
 

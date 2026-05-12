@@ -53,9 +53,6 @@ public class CategoriesController {
 
         try {
             CategoriesResponseDTO reponse = categoriesService.getById(id);
-            if (reponse == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
             return ResponseEntity.status(HttpStatus.OK).body(reponse);
         } catch (SecurityAuthorizationException e) {
             throw e;
@@ -74,10 +71,10 @@ public class CategoriesController {
     @PostMapping
     public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO) {
         try {
-            categoriesService.create(categoriesRequestDTO);
+            MessageResponseDTO responseDTO = categoriesService.create(categoriesRequestDTO);
 
             return ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new MessageResponseDTO("Categoría creada exitosamente"));
+                    .body(responseDTO);
 
         } catch (SecurityAuthorizationException e) {
 
@@ -104,9 +101,6 @@ public class CategoriesController {
 
         try {
             MessageResponseDTO messageResponseDTO = categoriesService.update(id, categoriesRequestDTO);
-            if (messageResponseDTO.getMessage().equals("Categoria no encontrada")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponseDTO);
-            }
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
         } catch (SecurityAuthorizationException e) {
 
@@ -129,9 +123,7 @@ public class CategoriesController {
 
         try {
             MessageResponseDTO messageResponseDTO = categoriesService.delete(id);
-            if (messageResponseDTO.getMessage().equals("Categoria no encontrada")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponseDTO);
-            }
+
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
         } catch (SecurityAuthorizationException e) {
 
