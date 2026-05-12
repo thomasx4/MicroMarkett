@@ -70,11 +70,8 @@ public class CategoriesService {
                 && !Role.assistant.name().equals(security.getCurrentRole())) {
             throw new SecurityAuthorizationException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
-        Categories categories = categoriesRepository.findById(id).orElse(null);
+        Categories categories = categoriesRepository.findById(id).orElseThrow(() -> new RuntimeException("Categoria no encontrado con el ID: " + id));
 
-        if (categories == null) {
-            return null;
-        }
         CategoriesResponseDTO categoriesResponseDTO = new CategoriesResponseDTO();
 
         categoriesResponseDTO.setId(categories.getId());
@@ -91,7 +88,7 @@ public class CategoriesService {
      * @param categoriesRequestDTO
      * @return Categoria creada convertida a DTO de respuesta
      */
-    public CategoriesResponseDTO create(CategoriesRequestDTO categoriesRequestDTO) {
+    public MessageResponseDTO create(CategoriesRequestDTO categoriesRequestDTO) {
 
         validateAdminRole();
 
@@ -103,15 +100,9 @@ public class CategoriesService {
         categories.setName(categoriesRequestDTO.getName());
         categories.setDescription(categoriesRequestDTO.getDescription());
 
-        Categories savedCategory = categoriesRepository.save(categories);
+        categoriesRepository.save(categories);
 
-        CategoriesResponseDTO responseDTO = new CategoriesResponseDTO();
-        responseDTO.setId(savedCategory.getId());
-        responseDTO.setName(savedCategory.getName());
-        responseDTO.setDescription(savedCategory.getDescription());
-        responseDTO.setCreatedAt(savedCategory.getCreatedAt());
-
-        return responseDTO;
+        return new MessageResponseDTO("Categoria creada correctamente");
     }
 
     /**
@@ -125,11 +116,8 @@ public class CategoriesService {
 
         validateAdminRole();
 
-        Categories categories = categoriesRepository.findById(id).orElse(null);
+        Categories categories = categoriesRepository.findById(id).orElseThrow(() -> new RuntimeException("Categoria no encontrado con ID: " + id));
 
-        if (categories == null) {
-            return new MessageResponseDTO("Categoria no encontrada");
-        }
         categories.setName(categoriesRequestDTO.getName());
         categories.setDescription(categoriesRequestDTO.getDescription());
         categoriesRepository.save(categories);
@@ -144,12 +132,10 @@ public class CategoriesService {
      */
     public MessageResponseDTO delete(Long id) {
         validateAdminRole();
-        
-        Categories categories = categoriesRepository.findById(id).orElse(null);
-        if (categories == null) {
-            return new MessageResponseDTO("Categoria no encontrada");
-        }
-        categoriesRepository.deleteById(id);
+
+        Categories categories = categoriesRepository.findById(id).orElseThrow(() -> new RuntimeException("Cateogria no encontrado con el id: " + id));
+
+        categoriesRepository.delete(categories);
         return new MessageResponseDTO("Categoria eliminada");
     }
 }

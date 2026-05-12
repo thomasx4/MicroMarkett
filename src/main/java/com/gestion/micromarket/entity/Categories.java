@@ -13,13 +13,13 @@ public class Categories {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "name")
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "description")
     private String description;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @PrePersist
