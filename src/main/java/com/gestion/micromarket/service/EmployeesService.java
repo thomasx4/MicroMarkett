@@ -155,16 +155,16 @@ public class EmployeesService {
      * @throws RuntimeException si ningún empleado tiene el rol especifico
      */
     public List<EmployeesResponseDTO> getEmployeesByRole(Role role) {
-
         validateAdminRole();
+
 
         List<Employees> employees = employeesRepository.findByRole(role);
 
-        if (!Role.administrator.name().equals(security.getCurrentRole())
-                && !Role.cashier.name().equals(security.getCurrentRole())
-                && !Role.assistant.name().equals(security.getCurrentRole())) {
+        if (!Role.administrator.equals(role)
+                && !Role.cashier.equals(role)
+                && !Role.assistant.equals(role)) {
             throw new RuntimeException(
-                    "El rol debe de ser 'administrator', 'cashier', o 'assistant' no: " + security.getCurrentRole());
+                    "El rol debe de ser 'administrator', 'cashier', o 'assistant' no: " + role);
         }
 
         if (employees.isEmpty()) {
@@ -199,10 +199,6 @@ public class EmployeesService {
         validateAdminRole();
 
         List<Employees> employees = employeesRepository.findByActive(active);
-
-        if (active == null) {
-            throw new RuntimeException("El estado activo es obligatorio (true o false)");
-        }
 
         if (employees.isEmpty()) {
             throw new RuntimeException("No se encontraron empleados con estado activo: " + active);
@@ -240,10 +236,6 @@ public class EmployeesService {
     public List<EmployeesResponseDTO> getEmployeesByHireDateRange(LocalDate startDate, LocalDate endDate) {
 
         validateAdminRole();
-
-        if (startDate == null || endDate == null) {
-            throw new RuntimeException("Las fechas de inicio y fin son obligatorias");
-        }
 
         if (startDate.isAfter(endDate)) {
             throw new RuntimeException("La fecha de inicio no puede ser mayor que la fecha de fin");

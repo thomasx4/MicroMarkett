@@ -16,22 +16,22 @@ public class Supplier {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "taxpayer_id", unique = true, length = 50)
+    @Column(name = "taxpayer_id")
     private String taxId;
 
-    @Column(name = "phone", length = 20)
+    @Column(name = "phone")
     private String phone;
 
-    @Column(name = "address", length = 200)
+    @Column(name = "address")
     private String address;
 
-    @Column(name = "email", length = 100)
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })

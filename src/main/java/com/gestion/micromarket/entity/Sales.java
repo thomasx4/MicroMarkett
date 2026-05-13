@@ -34,31 +34,31 @@ public class Sales {
      * Empleado que realizó la venta
      */
     @ManyToOne(fetch = FetchType.LAZY)  
-    @JoinColumn(name = "employee_id", nullable = false)
+    @JoinColumn(name = "employee_id")
     private Employees employee;
 
     /**
      * Fecha y hora en que se realizó la venta
      */
-    @Column(name = "sale_date", nullable = false, updatable = false)
+    @Column(name = "sale_date")
     private LocalDateTime saleDate;
 
     /**
      * Subtotal de la venta (sin IVA)
      */
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column()
     private BigDecimal subtotal;
 
     /**
      * Valor del IVA calculado para la venta
      */
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column()
     private BigDecimal vat;
 
     /**
      * Total de la venta (subtotal + IVA)
      */
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column()
     private BigDecimal total;
 
     /**

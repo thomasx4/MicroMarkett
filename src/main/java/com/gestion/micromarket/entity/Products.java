@@ -35,42 +35,42 @@ public class Products {
      * Nombre del producto.
      * No puede ser nulo y tiene una longitud máxima de 50 caracteres.
      */
-    @Column(nullable = false, length = 50)
+    @Column()
     private String name;
 
     /**
      * Código de barras único del producto.
      * No puede ser nulo, es único y tiene una longitud máxima de 50 caracteres.
      */
-    @Column(nullable = false, unique = true, length = 50)
+    @Column()
     private String barcode;
 
     /**
      * Precio del producto.
      * No puede ser nulo. Utiliza BigDecimal para representar valores monetarios con precisión.
      */
-    @Column(nullable = false) 
+    @Column() 
     private BigDecimal price; 
 
     /**
      * Cantidad de unidades disponibles en inventario.
      * No puede ser nulo.
      */
-    @Column(nullable = false)
+    @Column()
     private Long stock;
 
     /**
      * Estado del producto (activo/inactivo).
      * No puede ser nulo. false indica que el producto fue eliminado lógicamente.
      */
-    @Column(nullable = false)
+    @Column()
     private Boolean active;
 
     /**
      * Fecha y hora de creación del producto.
      * No se actualiza después de la inserción inicial.
      */
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     /**

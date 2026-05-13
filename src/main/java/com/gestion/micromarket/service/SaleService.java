@@ -17,7 +17,6 @@ import com.gestion.micromarket.entity.Employees;
 import com.gestion.micromarket.entity.Products;
 import com.gestion.micromarket.entity.SaleDetail;
 import com.gestion.micromarket.entity.Sales;
-import com.gestion.micromarket.enums.Role;
 import com.gestion.micromarket.repository.EmployeesRepository;
 import com.gestion.micromarket.repository.ProductsRepository;
 import com.gestion.micromarket.repository.SaleDetailRepository;
@@ -92,11 +91,6 @@ public class SaleService {
 
         }
 
-        if (employee.getRole() != Role.cashier) {
-            throw new RuntimeException(
-                    "El empleado no puede realizar la venta, solo el Cajero lo puede realizar ya que el rol del empleado es: "
-                            + employee.getRole());
-        }
 
         if (salesRequestDTO.getSaleDetails() == null || salesRequestDTO.getSaleDetails().isEmpty()) {
             throw new RuntimeException("La venta debe de tener por lo menos un producto");

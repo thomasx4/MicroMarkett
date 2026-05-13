@@ -95,6 +95,9 @@ public class EmployeesController {
         } catch (SecurityAuthorizationException e) {
 
             throw e;
+        } catch (RuntimeException e) {
+
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
 
@@ -116,6 +119,9 @@ public class EmployeesController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (SecurityAuthorizationException e) {
             throw e;
+        } catch (RuntimeException e) {
+
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -133,10 +139,19 @@ public class EmployeesController {
     public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByRole(@PathVariable String role) {
 
         try {
-            Role rolEnum = Role.valueOf(role.toLowerCase());
+            Role rolEnum;
+            try {
+                rolEnum = Role.valueOf(role.toLowerCase());
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException(
+                        "El rol '" + role + "' no es válido. Use: administrator, cashier o assistant");
+            }
             List<EmployeesResponseDTO> response = employeesService.getEmployeesByRole(rolEnum);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (SecurityAuthorizationException e) {
+            throw e;
+        } catch (RuntimeException e) {
+
             throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -160,7 +175,7 @@ public class EmployeesController {
         } catch (SecurityAuthorizationException e) {
             throw e;
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -184,7 +199,9 @@ public class EmployeesController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (SecurityAuthorizationException e) {
             throw e;
-        } catch (Exception e) {
+        }  catch (RuntimeException e) {
+            throw e;
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -205,6 +222,8 @@ public class EmployeesController {
             EmployeesResponseDTO response = employeesService.updateEmployeeComplete(id, employeesRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (SecurityAuthorizationException e) {
+            throw e;
+        }  catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -229,7 +248,9 @@ public class EmployeesController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (SecurityAuthorizationException e) {
             throw e;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
+            throw e;
+        }  catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -248,6 +269,8 @@ public class EmployeesController {
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
         } catch (SecurityAuthorizationException e) {
             throw e;
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -261,11 +284,13 @@ public class EmployeesController {
      */
     @DeleteMapping("/documentNumber/{documentNumber}")
     public ResponseEntity<MessageResponseDTO> deleteEmployeeByDocumentNumber(@PathVariable String documentNumber) {
-
+        
         try {
             MessageResponseDTO messageResponseDTO = employeesService.deleteEmployeeByNumberDocument(documentNumber);
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
         } catch (SecurityAuthorizationException e) {
+            throw e;
+        } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
