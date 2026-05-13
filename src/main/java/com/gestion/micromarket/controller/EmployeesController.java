@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.EmployeesRequestDTO;
 import com.gestion.micromarket.dto.EmployeesResponseDTO;
 import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.enums.Role;
+import com.gestion.micromarket.exception.SecurityAuthorizationException;
 import com.gestion.micromarket.service.EmployeesService;
 
 import jakarta.validation.Valid;
@@ -35,9 +35,6 @@ public class EmployeesController {
     /** Servicio de usuarios */
     private final EmployeesService employeesService;
 
-    /** Contexto de seguridad y sesión */
-    private final SecurityContext security;
-
     /**
      * Registra un nuevo empleado
      * 
@@ -48,14 +45,14 @@ public class EmployeesController {
     public ResponseEntity<MessageResponseDTO> createEmployees(
             @Valid @RequestBody EmployeesRequestDTO employeesRequestDTO) {
 
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
-
         try {
             MessageResponseDTO response = employeesService.createrEmployees(employeesRequestDTO);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (SecurityAuthorizationException e) {
+
+            throw e;
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new MessageResponseDTO(e.getMessage()));
         }
@@ -69,15 +66,17 @@ public class EmployeesController {
      */
     @GetMapping()
     public ResponseEntity<List<EmployeesResponseDTO>> getAllEmployees() {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
 
         try {
             List<EmployeesResponseDTO> response = employeesService.getAllEmployees();
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (SecurityAuthorizationException e) {
+
+            throw e;
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -89,18 +88,20 @@ public class EmployeesController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<EmployeesResponseDTO> getEmployeeById(@PathVariable Long id) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
 
         try {
             Optional<EmployeesResponseDTO> response = employeesService.getEmployeeById(id);
-            if (response.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).build(); //debo de eliminar esta condicion
-            }
             return ResponseEntity.status(HttpStatus.OK).body(response.get());
+        } catch (SecurityAuthorizationException e) {
+
+            throw e;
+        } catch (RuntimeException e) {
+
+            throw e;
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); //debo agregar 'error' 
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -112,15 +113,17 @@ public class EmployeesController {
      */
     @GetMapping("/documentNumber/{documentNumber}")
     public ResponseEntity<EmployeesResponseDTO> getEmployeeByDocumentNumber(@PathVariable String documentNumber) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
 
         try {
             EmployeesResponseDTO response = employeesService.getEmployeeByDocumentNumber(documentNumber);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
+        } catch (RuntimeException e) {
+
+            throw e;
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -134,19 +137,22 @@ public class EmployeesController {
      */
     @GetMapping("/role/{role}")
     public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByRole(@PathVariable String role) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
-
-        if (!role.equalsIgnoreCase("administrator") && !role.equalsIgnoreCase("cashier")
-                && !role.equalsIgnoreCase("assistant")) {
-            throw new RuntimeException("El rol debe de ser 'administrator', 'cashier', o 'assistant' no: " + role);
-        }
 
         try {
-            Role rolEnum = Role.valueOf(role.toLowerCase());
+            Role rolEnum;
+            try {
+                rolEnum = Role.valueOf(role.toLowerCase());
+            } catch (IllegalArgumentException e) {
+                throw new RuntimeException(
+                        "El rol '" + role + "' no es válido. Use: administrator, cashier o assistant");
+            }
             List<EmployeesResponseDTO> response = employeesService.getEmployeesByRole(rolEnum);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
+        } catch (RuntimeException e) {
+
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -161,19 +167,15 @@ public class EmployeesController {
      * @throws RuntimeException si el valor de (active) no es ni true ni false
      */
     @GetMapping("/active/{active}")
-    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByActive(@PathVariable String active) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
-
-        if (!active.equalsIgnoreCase("true") && !active.equalsIgnoreCase("false")) {
-            throw new RuntimeException("El valor debe ser 'true' o 'false', no: " + active);
-        }
+    public ResponseEntity<List<EmployeesResponseDTO>> getEmployeesByActive(@PathVariable Boolean active) {
 
         try {
-            Boolean activeBool = Boolean.valueOf(active);
-            List<EmployeesResponseDTO> response = employeesService.getEmployyesByActive(activeBool);
+            List<EmployeesResponseDTO> response = employeesService.getEmployyesByActive(active);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -192,14 +194,14 @@ public class EmployeesController {
             @RequestParam LocalDate startDate,
             @RequestParam LocalDate endDate) {
 
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
-
         try {
             List<EmployeesResponseDTO> response = employeesService.getEmployeesByHireDateRange(startDate, endDate);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
+        }  catch (RuntimeException e) {
+            throw e;
+        }catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -216,13 +218,13 @@ public class EmployeesController {
             @PathVariable Long id,
             @RequestBody EmployeesRequestDTO employeesRequestDTO) {
 
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
-
         try {
             EmployeesResponseDTO response = employeesService.updateEmployeeComplete(id, employeesRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
+        }  catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -241,14 +243,14 @@ public class EmployeesController {
             @PathVariable Long id,
             @RequestBody EmployeesRequestDTO employeesRequestDTO) {
 
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
-
         try {
             EmployeesResponseDTO response = employeesService.updateEmployee(id, employeesRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(response);
-        } catch (Exception e) {
+        } catch (SecurityAuthorizationException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw e;
+        }  catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -261,13 +263,14 @@ public class EmployeesController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> deleteEmployeeByid(@PathVariable Long id) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
 
         try {
             MessageResponseDTO messageResponseDTO = employeesService.deleteEmployeeByid(id);
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -281,13 +284,14 @@ public class EmployeesController {
      */
     @DeleteMapping("/documentNumber/{documentNumber}")
     public ResponseEntity<MessageResponseDTO> deleteEmployeeByDocumentNumber(@PathVariable String documentNumber) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
-
+        
         try {
             MessageResponseDTO messageResponseDTO = employeesService.deleteEmployeeByNumberDocument(documentNumber);
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
