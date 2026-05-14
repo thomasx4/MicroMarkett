@@ -9,27 +9,51 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 
+import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.*;
 import com.gestion.micromarket.entity.*;
+import com.gestion.micromarket.enums.Role;
+import com.gestion.micromarket.exception.SecurityAuthorizationException;
 import com.gestion.micromarket.repository.*;
 
 @Service
 @RequiredArgsConstructor
 public class ProductsService {
 
+    /** Repositorio de productos */
     private final ProductsRepository repository;
+
+    /** Respositorio de categorias */
     private final CategoriesRepository categoryRepository;
+
+    /** Repositorio de proveedores */
     private final SupplierRepository supplierRepository;
+
+    /** Contexto de seguridad y sesión */
+    private final SecurityContext security;
+
+    /**
+     * Método privado para reutilizar la lógica de validación de administrador.
+     */
+    private void validateAdminRole() {
+        if (!Role.administrator.name().equals(security.getCurrentRole())) {
+            throw new SecurityAuthorizationException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
+        }
+    }
 
     /**
      * Crea un nuevo producto en el sistema.
      *
      * @param dto Objeto con los datos del producto a crear.
-     * @return MessageResponseDTO con un mensaje indicando que el producto fue creado correctamente
-     * @throws RuntimeException Si el código de barras ya existe o si la categoría especificada no se encuentra
+     * @return MessageResponseDTO con un mensaje indicando que el producto fue
+     *         creado correctamente
+     * @throws RuntimeException Si el código de barras ya existe o si la categoría
+     *                          especificada no se encuentra
      */
     @Transactional
     public MessageResponseDTO create(ProductsRequestDTO dto) {
+
+        validateAdminRole();
 
         if (repository.existsByBarcode(dto.getBarcode())) {
             throw new RuntimeException("El código de barras ya existe");
@@ -55,10 +79,13 @@ public class ProductsService {
     /**
      * Obtiene todos los productos activos del sistema.
      *
-     * @return Lista de objetos ProductsResponseDTO con los datos de los productos activos
+     * @return Lista de objetos ProductsResponseDTO con los datos de los productos
+     *         activos
      */
     @Transactional(readOnly = true)
     public List<ProductsResponseDTO> findAll() {
+        validateAdminRole();
+
         return repository.findAllByActiveTrue()
                 .stream()
                 .map(this::toDTO)
@@ -70,10 +97,13 @@ public class ProductsService {
      *
      * @param id Identificador único del producto
      * @return ProductsResponseDTO con los datos del producto encontrado
-     * @throws RuntimeException Si no existe un producto activo con el ID proporcionado
+     * @throws RuntimeException Si no existe un producto activo con el ID
+     *                          proporcionado
      */
     @Transactional(readOnly = true)
     public ProductsResponseDTO findById(Long id) {
+        validateAdminRole();
+
         Products product = repository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
@@ -81,14 +111,18 @@ public class ProductsService {
     }
 
     /**
-     * Busca productos por nombre (coincidencia parcial, ignorando mayúsculas/minúsculas).
+     * Busca productos por nombre (coincidencia parcial, ignorando
+     * mayúsculas/minúsculas).
      *
      * @param name Nombre o parte del nombre del producto a buscar
-     * @return Lista de ProductsResponseDTO con los productos activos que coinciden con el nombre
-     * @throws RuntimeException Si no se encuentran productos activos con el nombre especificado
+     * @return Lista de ProductsResponseDTO con los productos activos que coinciden
+     *         con el nombre
+     * @throws RuntimeException Si no se encuentran productos activos con el nombre
+     *                          especificado
      */
     @Transactional(readOnly = true)
     public List<ProductsResponseDTO> findByName(String name) {
+        validateAdminRole();
 
         List<Products> products = repository.findByNameContainingIgnoreCaseAndActiveTrue(name);
 
@@ -104,10 +138,12 @@ public class ProductsService {
      *
      * @param barcode Código de barras único del producto
      * @return ProductsResponseDTO con los datos del producto encontrado
-     * @throws RuntimeException Si no existe un producto activo con el código de barras proporcionado
+     * @throws RuntimeException Si no existe un producto activo con el código de
+     *                          barras proporcionado
      */
     @Transactional(readOnly = true)
     public ProductsResponseDTO findByBarcode(String barcode) {
+        validateAdminRole();
 
         Products product = repository.findByBarcodeAndActiveTrue(barcode)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado con ese código de barras"));
@@ -116,14 +152,18 @@ public class ProductsService {
     }
 
     /**
-     * Obtiene todos los productos activos pertenecientes a una categoría específica.
+     * Obtiene todos los productos activos pertenecientes a una categoría
+     * específica.
      *
      * @param categoryId Identificador de la categoría
-     * @return Lista de ProductsResponseDTO con los productos activos de la categoría
-     * @throws RuntimeException Si no hay productos activos en la categoría especificada
+     * @return Lista de ProductsResponseDTO con los productos activos de la
+     *         categoría
+     * @throws RuntimeException Si no hay productos activos en la categoría
+     *                          especificada
      */
     @Transactional(readOnly = true)
     public List<ProductsResponseDTO> findByCategory(Long categoryId) {
+        validateAdminRole();
 
         List<Products> products = repository.findByCategoryIdAndActiveTrue(categoryId);
 
@@ -138,11 +178,15 @@ public class ProductsService {
      * Realiza un borrado lógico de un producto, cambiando su estado activo a falso.
      *
      * @param id Identificador del producto a eliminar
-     * @return MessageResponseDTO con un mensaje indicando que el producto fue eliminado correctamente
-     * @throws RuntimeException Si no se encuentra un producto con el ID proporcionado
+     * @return MessageResponseDTO con un mensaje indicando que el producto fue
+     *         eliminado correctamente
+     * @throws RuntimeException Si no se encuentra un producto con el ID
+     *                          proporcionado
      */
     @Transactional
     public MessageResponseDTO softDelete(Long id) {
+        validateAdminRole();
+
         Products product = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
@@ -155,13 +199,18 @@ public class ProductsService {
     /**
      * Actualiza los datos de un producto existente.
      *
-     * @param id Identificador del producto a actualizar
+     * @param id  Identificador del producto a actualizar
      * @param dto Objeto con los nuevos datos del producto
-     * @return MessageResponseDTO con un mensaje indicando que el producto fue actualizado correctamente
-     * @throws RuntimeException Si el producto no existe, si el nuevo código de barras ya está en uso por otro producto, o si la categoría especificada no se encuentra
+     * @return MessageResponseDTO con un mensaje indicando que el producto fue
+     *         actualizado correctamente
+     * @throws RuntimeException Si el producto no existe, si el nuevo código de
+     *                          barras ya está en uso por otro producto, o si la
+     *                          categoría especificada no se encuentra
      */
     @Transactional
     public MessageResponseDTO update(Long id, ProductsRequestDTO dto) {
+
+        validateAdminRole();
 
         Products product = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
@@ -190,11 +239,14 @@ public class ProductsService {
      * Restaura un producto previamente eliminado.
      *
      * @param id Identificador del producto a restaurar
-     * @return MessageResponseDTO con un mensaje indicando que el producto fue restaurado correctamente
+     * @return MessageResponseDTO con un mensaje indicando que el producto fue
+     *         restaurado correctamente
      * @throws RuntimeException Si el producto no existe o si ya se encuentra activo
      */
     @Transactional
     public MessageResponseDTO restore(Long id) {
+        validateAdminRole();
+
         Products product = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
@@ -213,11 +265,15 @@ public class ProductsService {
      *
      * @param productId  Identificador del producto
      * @param supplierId Identificador del proveedor
-     * @return MessageResponseDTO con un mensaje indicando que el proveedor fue agregado correctamente
-     * @throws RuntimeException Si el producto no existe o no está activo, o si el proveedor no se encuentra
+     * @return MessageResponseDTO con un mensaje indicando que el proveedor fue
+     *         agregado correctamente
+     * @throws RuntimeException Si el producto no existe o no está activo, o si el
+     *                          proveedor no se encuentra
      */
     @Transactional
     public MessageResponseDTO addSupplier(Long productId, Long supplierId) {
+        validateAdminRole();
+
         Products product = repository.findByIdAndActiveTrue(productId)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
@@ -235,11 +291,15 @@ public class ProductsService {
      *
      * @param productId  Identificador del producto
      * @param supplierId Identificador del proveedor
-     * @return MessageResponseDTO con un mensaje indicando que el proveedor fue removido correctamente
-     * @throws RuntimeException Si el producto no existe o no está activo, o si el proveedor no se encuentra
+     * @return MessageResponseDTO con un mensaje indicando que el proveedor fue
+     *         removido correctamente
+     * @throws RuntimeException Si el producto no existe o no está activo, o si el
+     *                          proveedor no se encuentra
      */
     @Transactional
     public MessageResponseDTO removeSupplier(Long productId, Long supplierId) {
+        validateAdminRole();
+
         Products product = repository.findByIdAndActiveTrue(productId)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
@@ -261,6 +321,8 @@ public class ProductsService {
      */
     @Transactional(readOnly = true)
     public Set<Supplier> getSuppliersByProduct(Long productId) {
+        validateAdminRole();
+
         Products product = repository.findByIdAndActiveTrue(productId)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 

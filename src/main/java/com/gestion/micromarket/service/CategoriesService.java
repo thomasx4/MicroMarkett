@@ -12,6 +12,7 @@ import com.gestion.micromarket.repository.CategoriesRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,8 @@ public class CategoriesService {
      * 
      * @return Lista de categorias convertidas a DTO de respuesta
      */
+    @Transactional(readOnly = true)
+
     public List<CategoriesResponseDTO> getAll() {
         validateAdminRole();
 
@@ -65,6 +68,8 @@ public class CategoriesService {
      * @param id
      * @return Categoria convertida a DTO de respuesta y si no existe null
      */
+    @Transactional(readOnly = true)
+
     public CategoriesResponseDTO getById(Long id) {
         if (!Role.administrator.name().equals(security.getCurrentRole())
                 && !Role.assistant.name().equals(security.getCurrentRole())) {
@@ -88,6 +93,8 @@ public class CategoriesService {
      * @param categoriesRequestDTO
      * @return Categoria creada convertida a DTO de respuesta
      */
+    @Transactional
+
     public MessageResponseDTO create(CategoriesRequestDTO categoriesRequestDTO) {
 
         validateAdminRole();
@@ -112,6 +119,8 @@ public class CategoriesService {
      * @param categoriesRequestDTO
      * @return Mensaje indicando el resultado de la operacion
      */
+    @Transactional
+
     public MessageResponseDTO update(Long id, CategoriesRequestDTO categoriesRequestDTO) {
 
         validateAdminRole();
@@ -130,6 +139,8 @@ public class CategoriesService {
      * @param id
      * @return Mensaje indicando el resultado de la operacion
      */
+    @Transactional
+
     public MessageResponseDTO delete(Long id) {
         validateAdminRole();
 
