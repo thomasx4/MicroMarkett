@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.EmployeesRequestDTO;
@@ -45,6 +46,7 @@ public class EmployeesService {
      * @return mensaje de confirmación de creación
      * @throws RuntimeException si el número de documento ya está registrado
      */
+    @Transactional
     public MessageResponseDTO createrEmployees(EmployeesRequestDTO employeesRequestDTO) {
 
         validateAdminRole();
@@ -73,6 +75,7 @@ public class EmployeesService {
      * 
      * @return lista de empleados como DTOs de respuesta
      */
+    @Transactional(readOnly = true)
     public List<EmployeesResponseDTO> getAllEmployees() {
         validateAdminRole();
 
@@ -101,6 +104,8 @@ public class EmployeesService {
      * @param id
      * @return empleado encontrado envuelto en un {@link Optional}
      */
+    @Transactional(readOnly = true)
+
     public Optional<EmployeesResponseDTO> getEmployeeById(Long id) {
         validateAdminRole();
 
@@ -128,6 +133,8 @@ public class EmployeesService {
      * @throws RuntimeException si no existe un empleado con el número de documento
      *                          especificado
      */
+    @Transactional(readOnly = true)
+
     public EmployeesResponseDTO getEmployeeByDocumentNumber(String documentNumber) {
         validateAdminRole();
 
@@ -154,9 +161,10 @@ public class EmployeesService {
      * @return lista de empleados con ese rol
      * @throws RuntimeException si ningún empleado tiene el rol especifico
      */
+    @Transactional(readOnly = true)
+
     public List<EmployeesResponseDTO> getEmployeesByRole(Role role) {
         validateAdminRole();
-
 
         List<Employees> employees = employeesRepository.findByRole(role);
 
@@ -195,6 +203,8 @@ public class EmployeesService {
      * @return lista de empleado con el estado específico
      * @throws RuntimeException si ningún empleado tiene el estado indicado
      */
+    @Transactional(readOnly = true)
+
     public List<EmployeesResponseDTO> getEmployyesByActive(Boolean active) {
         validateAdminRole();
 
@@ -233,6 +243,8 @@ public class EmployeesService {
      *                          inicio es mayor a la fecha fin o si ningun empleado
      *                          fue contratado en ese lapso
      */
+    @Transactional(readOnly = true)
+
     public List<EmployeesResponseDTO> getEmployeesByHireDateRange(LocalDate startDate, LocalDate endDate) {
 
         validateAdminRole();
@@ -265,6 +277,8 @@ public class EmployeesService {
      *                          null o el numero de documento ya pertenece a otro
      *                          empleado
      */
+    @Transactional
+
     public EmployeesResponseDTO updateEmployeeComplete(Long id, EmployeesRequestDTO employeesRequestDTO) {
 
         validateAdminRole();
@@ -321,6 +335,8 @@ public class EmployeesService {
      * @throws RuntimeException si el empleado no se encuentra, si el numero de
      *                          dovumento ya esta utilizado por otro empleado
      */
+    @Transactional
+
     public EmployeesResponseDTO updateEmployee(Long id, EmployeesRequestDTO employeesRequestDTO) {
 
         validateAdminRole();
@@ -369,6 +385,8 @@ public class EmployeesService {
      * @return mensaje de confirmación de eliminación
      * @throws RuntimeException si el id empleado no fué encontrado
      */
+    @Transactional
+
     public MessageResponseDTO deleteEmployeeByid(Long id) {
 
         validateAdminRole();
@@ -388,6 +406,8 @@ public class EmployeesService {
      * @return mensaje de confirmación de eliminación
      * @throws RuntimeException si el numero de documento no se encontró
      */
+    @Transactional
+
     public MessageResponseDTO deleteEmployeeByNumberDocument(String documentNumber) {
 
         validateAdminRole();

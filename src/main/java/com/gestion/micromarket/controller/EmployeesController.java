@@ -123,6 +123,8 @@ public class EmployeesController {
 
             throw e;
         } catch (Exception e) {
+            e.printStackTrace();
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -154,6 +156,8 @@ public class EmployeesController {
 
             throw e;
         } catch (Exception e) {
+            e.printStackTrace();
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -199,9 +203,9 @@ public class EmployeesController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (SecurityAuthorizationException e) {
             throw e;
-        }  catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             throw e;
-        }catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -223,7 +227,7 @@ public class EmployeesController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (SecurityAuthorizationException e) {
             throw e;
-        }  catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -250,7 +254,7 @@ public class EmployeesController {
             throw e;
         } catch (RuntimeException e) {
             throw e;
-        }  catch (Exception e) {
+        } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
@@ -284,7 +288,7 @@ public class EmployeesController {
      */
     @DeleteMapping("/documentNumber/{documentNumber}")
     public ResponseEntity<MessageResponseDTO> deleteEmployeeByDocumentNumber(@PathVariable String documentNumber) {
-        
+
         try {
             MessageResponseDTO messageResponseDTO = employeesService.deleteEmployeeByNumberDocument(documentNumber);
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);

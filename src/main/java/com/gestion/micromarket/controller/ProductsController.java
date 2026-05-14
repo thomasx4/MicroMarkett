@@ -7,13 +7,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.*;
 import com.gestion.micromarket.entity.Supplier;
+import com.gestion.micromarket.exception.SecurityAuthorizationException;
 import com.gestion.micromarket.service.ProductsService;
 
 @RestController
@@ -24,9 +23,6 @@ public class ProductsController {
     /** Servicio de prodcutos */
     private final ProductsService service;
 
-    /** Contexto de seguridad y sesión */
-    private final SecurityContext security;
-
     /**
      * Crea un nuevo producto.
      *
@@ -35,16 +31,15 @@ public class ProductsController {
      *         operación
      */
     @PostMapping
-    public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody ProductsRequestDTO dto,
-            HttpServletRequest request) {
-        String role = (String) request.getAttribute("role");
-        if (!"administrator".equals(role)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new MessageResponseDTO("No tienes permiso"));
-        }
+    public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody ProductsRequestDTO dto) {
+
         try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
+            MessageResponseDTO requestDTO = service.create(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(requestDTO);
         } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO(e.getMessage()));
         }
     }
@@ -56,14 +51,18 @@ public class ProductsController {
      */
     @GetMapping
     public ResponseEntity<List<ProductsResponseDTO>> findAll() {
-        if (security.getCurrentRole() == null) {
-            throw new RuntimeException("EL rol no esta permitido");
-        }
+
         try {
-            return ResponseEntity.ok(service.findAll());
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            List<ProductsResponseDTO> responseDTOs = service.findAll();
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTOs);
+        } catch (SecurityAuthorizationException e) {
+
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
+
     }
 
     /**
@@ -74,13 +73,19 @@ public class ProductsController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<ProductsResponseDTO> findById(@PathVariable Long id) {
-        if (security.getCurrentRole() == null) {
-            throw new RuntimeException("EL rol no esta permitido");
-        }
+
         try {
-            return ResponseEntity.ok(service.findById(id));
+            ProductsResponseDTO response = service.findById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (SecurityAuthorizationException e) {
+
+            throw e;
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -93,13 +98,19 @@ public class ProductsController {
      */
     @GetMapping("/name/{name}")
     public ResponseEntity<List<ProductsResponseDTO>> findByName(@PathVariable String name) {
-        if (security.getCurrentRole() == null) {
-            throw new RuntimeException("EL rol no esta permitido");
-        }
+
         try {
-            return ResponseEntity.ok(service.findByName(name));
+            List<ProductsResponseDTO> responseDTOs = service.findByName(name);
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTOs);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -111,13 +122,19 @@ public class ProductsController {
      */
     @GetMapping("/barcode/{barcode}")
     public ResponseEntity<ProductsResponseDTO> findByBarcode(@PathVariable String barcode) {
-        if (security.getCurrentRole() == null) {
-            throw new RuntimeException("EL rol no esta permitido");
-        }
+
         try {
-            return ResponseEntity.ok(service.findByBarcode(barcode));
+            ProductsResponseDTO responseDTO = service.findByBarcode(barcode);
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -130,13 +147,19 @@ public class ProductsController {
      */
     @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<ProductsResponseDTO>> findByCategory(@PathVariable Long categoryId) {
-        if (security.getCurrentRole() == null) {
-            throw new RuntimeException("EL rol no esta permitido");
-        }
+
         try {
-            return ResponseEntity.ok(service.findByCategory(categoryId));
+            List<ProductsResponseDTO> responseDTOs = service.findByCategory(categoryId);
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTOs);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -151,13 +174,16 @@ public class ProductsController {
     @PutMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> update(@PathVariable Long id,
             @Valid @RequestBody ProductsRequestDTO dto) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
+
         try {
-            return ResponseEntity.ok(service.update(id, dto));
+            MessageResponseDTO responseDTO = service.update(id, dto);
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO(e.getMessage()));
+            throw e;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -170,13 +196,16 @@ public class ProductsController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> softDelete(@PathVariable Long id) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
+
         try {
-            return ResponseEntity.ok(service.softDelete(id));
+            MessageResponseDTO messageResponseDTO = service.softDelete(id);
+            return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO(e.getMessage()));
+            throw e;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -189,14 +218,16 @@ public class ProductsController {
      */
     @PatchMapping("/{id}/restore")
     public ResponseEntity<MessageResponseDTO> restore(@PathVariable Long id) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
 
         try {
-            return ResponseEntity.ok(service.restore(id));
+            MessageResponseDTO responseDTO = service.restore(id);
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO(e.getMessage()));
+            throw e;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -210,13 +241,17 @@ public class ProductsController {
     @PostMapping("/{productId}/suppliers/{supplierId}")
     public ResponseEntity<MessageResponseDTO> addSupplier(@PathVariable Long productId,
             @PathVariable Long supplierId) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
+
         try {
-            return ResponseEntity.ok(service.addSupplier(productId, supplierId));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO(e.getMessage()));
+            MessageResponseDTO responseDTO = service.addSupplier(productId, supplierId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDTO);
+        } catch (SecurityAuthorizationException e) {
+
+            throw e;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new MessageResponseDTO(e.getMessage()));
         }
     }
 
@@ -230,13 +265,16 @@ public class ProductsController {
     @DeleteMapping("/{productId}/suppliers/{supplierId}")
     public ResponseEntity<MessageResponseDTO> removeSupplier(@PathVariable Long productId,
             @PathVariable Long supplierId) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
+
         try {
-            return ResponseEntity.ok(service.removeSupplier(productId, supplierId));
+            MessageResponseDTO responseDTO = service.removeSupplier(productId, supplierId);
+            return ResponseEntity.status(HttpStatus.OK).body(responseDTO);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new MessageResponseDTO(e.getMessage()));
+            throw e;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 
@@ -248,13 +286,16 @@ public class ProductsController {
      */
     @GetMapping("/{productId}/suppliers")
     public ResponseEntity<Set<Supplier>> getSuppliersByProduct(@PathVariable Long productId) {
-        if (security.getCurrentRole() == null) {
-            throw new RuntimeException("EL rol no esta permitido");
-        }
+
         try {
-            return ResponseEntity.ok(service.getSuppliersByProduct(productId));
+            Set<Supplier> set = service.getSuppliersByProduct(productId);
+            return ResponseEntity.status(HttpStatus.OK).body(set);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            throw e;
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
 }
