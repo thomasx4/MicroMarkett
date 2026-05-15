@@ -1,9 +1,9 @@
 package com.gestion.micromarket.controller;
 
-import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.CategoriesRequestDTO;
 import com.gestion.micromarket.dto.CategoriesResponseDTO;
 import com.gestion.micromarket.dto.MessageResponseDTO;
+import com.gestion.micromarket.exception.SecurityAuthorizationException;
 import com.gestion.micromarket.service.CategoriesService;
 
 import jakarta.validation.Valid;
@@ -23,9 +23,6 @@ public class CategoriesController {
     /** Servicio de categoria */
     private final CategoriesService categoriesService;
 
-    /** Contexto de seguridad y sesión */
-    private final SecurityContext security;
-
     /**
      * Obtiene todas las categorias
      * 
@@ -33,13 +30,12 @@ public class CategoriesController {
      */
     @GetMapping
     public ResponseEntity<List<CategoriesResponseDTO>> getAll() {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
 
         try {
             List<CategoriesResponseDTO> list = categoriesService.getAll();
             return ResponseEntity.status(HttpStatus.OK).body(list);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -54,17 +50,12 @@ public class CategoriesController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<CategoriesResponseDTO> getById(@PathVariable Long id) {
-        String role = security.getCurrentRole();
-        if (!"administrator".equals(role) && !"assistant".equals(role)) {
-            throw new RuntimeException("EL rol: '" + role + "' no esta permitido");
-        }
 
         try {
             CategoriesResponseDTO reponse = categoriesService.getById(id);
-            if (reponse == null) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-            }
             return ResponseEntity.status(HttpStatus.OK).body(reponse);
+        } catch (SecurityAuthorizationException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -78,19 +69,20 @@ public class CategoriesController {
      * @return Categoria creada o mensaje de error
      */
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
-
+    public ResponseEntity<MessageResponseDTO> create(@Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO) {
         try {
-            CategoriesResponseDTO response = categoriesService.create(categoriesRequestDTO);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            MessageResponseDTO responseDTO = categoriesService.create(categoriesRequestDTO);
+
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body(responseDTO);
+
+        } catch (SecurityAuthorizationException e) {
+
+            throw e;
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new MessageResponseDTO(e.getMessage()));
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new MessageResponseDTO("Error: " + e.getMessage()));
         }
@@ -106,16 +98,13 @@ public class CategoriesController {
     @PutMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> update(@PathVariable Long id,
             @Valid @RequestBody CategoriesRequestDTO categoriesRequestDTO) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
 
         try {
             MessageResponseDTO messageResponseDTO = categoriesService.update(id, categoriesRequestDTO);
-            if (messageResponseDTO.getMessage().equals("Categoria no encontrada")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponseDTO);
-            }
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
+        } catch (SecurityAuthorizationException e) {
+
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -131,16 +120,14 @@ public class CategoriesController {
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<MessageResponseDTO> delete(@PathVariable Long id) {
-        if (!"administrator".equals(security.getCurrentRole())) {
-            throw new RuntimeException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
-        }
 
         try {
             MessageResponseDTO messageResponseDTO = categoriesService.delete(id);
-            if (messageResponseDTO.getMessage().equals("Categoria no encontrada")) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(messageResponseDTO);
-            }
+
             return ResponseEntity.status(HttpStatus.OK).body(messageResponseDTO);
+        } catch (SecurityAuthorizationException e) {
+
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -1,14 +1,18 @@
 package com.gestion.micromarket.service;
 
+import com.gestion.micromarket.config.SecurityContext;
 import com.gestion.micromarket.dto.CategoriesRequestDTO;
 import com.gestion.micromarket.dto.CategoriesResponseDTO;
 import com.gestion.micromarket.dto.MessageResponseDTO;
 import com.gestion.micromarket.entity.Categories;
+import com.gestion.micromarket.enums.Role;
+import com.gestion.micromarket.exception.SecurityAuthorizationException;
 import com.gestion.micromarket.repository.CategoriesRepository;
 
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +25,32 @@ public class CategoriesService {
      */
     private final CategoriesRepository categoriesRepository;
 
+    /** Contexto de seguridad y sesión */
+    private final SecurityContext security;
+
+    /**
+     * Método privado para reutilizar la lógica de validación de administrador.
+     */
+    private void validateAdminRole() {
+        if (!Role.administrator.name().equals(security.getCurrentRole())) {
+            throw new SecurityAuthorizationException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
+        }
+    }
+
     /**
      * Obtiene todas las categorias
      * 
-     * @return Lista de categorias convertidas a DTO de respuesta 
+     * @return Lista de categorias convertidas a DTO de respuesta
      */
-    public List<CategoriesResponseDTO> getAll(){
+    @Transactional(readOnly = true)
+
+    public List<CategoriesResponseDTO> getAll() {
+        validateAdminRole();
+
         List<Categories> list = categoriesRepository.findAll();
         List<CategoriesResponseDTO> response = new ArrayList<>();
 
-        for(Categories categories : list){
+        for (Categories categories : list) {
             CategoriesResponseDTO categoriesResponseDTO = new CategoriesResponseDTO();
 
             categoriesResponseDTO.setId(categories.getId());
@@ -48,12 +68,15 @@ public class CategoriesService {
      * @param id
      * @return Categoria convertida a DTO de respuesta y si no existe null
      */
-    public CategoriesResponseDTO getById(Long id){
-        Categories categories = categoriesRepository.findById(id).orElse(null);
+    @Transactional(readOnly = true)
 
-        if(categories == null){
-            return null;
+    public CategoriesResponseDTO getById(Long id) {
+        if (!Role.administrator.name().equals(security.getCurrentRole())
+                && !Role.assistant.name().equals(security.getCurrentRole())) {
+            throw new SecurityAuthorizationException("EL rol: '" + security.getCurrentRole() + "' no esta permitido");
         }
+        Categories categories = categoriesRepository.findById(id).orElseThrow(() -> new RuntimeException("Categoria no encontrado con el ID: " + id));
+
         CategoriesResponseDTO categoriesResponseDTO = new CategoriesResponseDTO();
 
         categoriesResponseDTO.setId(categories.getId());
@@ -70,24 +93,23 @@ public class CategoriesService {
      * @param categoriesRequestDTO
      * @return Categoria creada convertida a DTO de respuesta
      */
-    public CategoriesResponseDTO create(CategoriesRequestDTO categoriesRequestDTO){
-        if(categoriesRepository.findByName(categoriesRequestDTO.getName()).isPresent()){
+    @Transactional
+
+    public MessageResponseDTO create(CategoriesRequestDTO categoriesRequestDTO) {
+
+        validateAdminRole();
+
+        if (categoriesRepository.findByName(categoriesRequestDTO.getName()).isPresent()) {
             throw new RuntimeException("La categoria ya existe");
         }
-        
+
         Categories categories = new Categories();
         categories.setName(categoriesRequestDTO.getName());
         categories.setDescription(categoriesRequestDTO.getDescription());
 
-        Categories savedCategory = categoriesRepository.save(categories);
-        
-        CategoriesResponseDTO responseDTO = new CategoriesResponseDTO();
-        responseDTO.setId(savedCategory.getId());
-        responseDTO.setName(savedCategory.getName());
-        responseDTO.setDescription(savedCategory.getDescription());
-        responseDTO.setCreatedAt(savedCategory.getCreatedAt());
-        
-        return responseDTO;
+        categoriesRepository.save(categories);
+
+        return new MessageResponseDTO("Categoria creada correctamente");
     }
 
     /**
@@ -97,12 +119,14 @@ public class CategoriesService {
      * @param categoriesRequestDTO
      * @return Mensaje indicando el resultado de la operacion
      */
-    public MessageResponseDTO update(Long id, CategoriesRequestDTO categoriesRequestDTO){
-        Categories categories = categoriesRepository.findById(id).orElse(null);
-        
-        if(categories == null){
-            return new MessageResponseDTO("Categoria no encontrada");
-        }
+    @Transactional
+
+    public MessageResponseDTO update(Long id, CategoriesRequestDTO categoriesRequestDTO) {
+
+        validateAdminRole();
+
+        Categories categories = categoriesRepository.findById(id).orElseThrow(() -> new RuntimeException("Categoria no encontrado con ID: " + id));
+
         categories.setName(categoriesRequestDTO.getName());
         categories.setDescription(categoriesRequestDTO.getDescription());
         categoriesRepository.save(categories);
@@ -110,17 +134,19 @@ public class CategoriesService {
     }
 
     /**
-     * Elimina una categoria por su Id 
+     * Elimina una categoria por su Id
      * 
      * @param id
      * @return Mensaje indicando el resultado de la operacion
      */
-    public MessageResponseDTO delete(Long id){
-        Categories categories = categoriesRepository.findById(id).orElse(null);
-        if(categories == null){
-            return new MessageResponseDTO("Categoria no encontrada");
-        }
-        categoriesRepository.deleteById(id);
+    @Transactional
+
+    public MessageResponseDTO delete(Long id) {
+        validateAdminRole();
+
+        Categories categories = categoriesRepository.findById(id).orElseThrow(() -> new RuntimeException("Cateogria no encontrado con el id: " + id));
+
+        categoriesRepository.delete(categories);
         return new MessageResponseDTO("Categoria eliminada");
     }
 }

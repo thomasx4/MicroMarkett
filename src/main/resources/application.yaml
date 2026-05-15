@@ -36,4 +36,4 @@ security:
   jwt:
     # Genera llave secreta con openssl rand -base64 32
     secret-key: efmycl3ZY1LasnSGalvccYA1nR5Yo3r9WdWYoHft8rY=
-    token-expiration: 600000 # 10 min expresado en ms
+    token-expiration: 1000000 # 10 min expresado en ms

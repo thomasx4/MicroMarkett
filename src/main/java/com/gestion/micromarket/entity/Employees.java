@@ -37,48 +37,48 @@ public class Employees {
     /**
      * Número de documento de identidad del empleado
      */
-    @Column(name = "document_number",  nullable = false)
+    @Column(name = "document_number")
     private String documentNumber;
 
     /**
      * Nombre completo del empleado
      */
-    @Column(name = "name",  nullable = false)
+    @Column(name = "name")
     private String name;
 
     /**
      * Rol del empleado dentro del sistema. Se persiste como texto en la BD
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "role",  nullable = false)
+    @Column(name = "role")
     private Role role;
 
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password")
     private String password;
 
     /**
      * Fecha en que el empleado fue contratado
      */
-    @Column(name = "hire_date",  nullable = false)
+    @Column(name = "hire_date")
     private LocalDate hireDate;
 
     /**
      * Salario actual del empleado
      */
-    @Column(name = "salary",  nullable = false)
+    @Column(name = "salary")
     private BigDecimal salary;
 
     /**
      * Estado del empleado, por defecto es true
      */
-    @Column(name = "active", nullable = false)
+    @Column(name = "active")
     private Boolean active = true;
 
     /**
      * Fecha y hora en que el empleado fúe registrado
      * Este no se puede actualizar después de creado
      */
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     /**
